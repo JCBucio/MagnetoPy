@@ -19,3 +19,26 @@ To check if MagnetoPy was installed correctly, simply run the following command:
 >> python magnetopy.py
 ```
 
+## Processing magnetic data
+To begin with the processing of magnetic data, we must pass to MagnetoPy the following parameters:
+
+- **`stationsfile`**: Path to the file containing the magnetic data files from field stations.
+- **`basefile`**: Path to the file containing the magnetic data files from base stations.
+- **`outputfile`**: Path to the file where the output will be saved.
+
+The `stationsfile` must contain the following columns:
+- **date**: Date of the measurement in DD/MM/YYYY format.
+- **time**: Time of the measurement in HH:MM:SS format.
+- **magfield**: Magnetic field intensity in nT from each station.
+- **lat**: Latitude of the station in decimal degrees.
+- **lon**: Longitude of the station in decimal degrees.
+
+The `basefile` must contain the following columns:
+- **date**: Date of the measurement in DD/MM/YYYY format.
+- **time**: Time of the measurement in HH:MM:SS format.
+- **magfield**: Magnetic field intensity in nT from each base station measurement.
+
+Aditionally to the previous information, the `outputfile` will display the following data:
+- **diff_time**: Time difference between the station measurement and the base station measurement.
+- **diurnal_var**: Diurnal variation of the magnetic field intensity.
+- **igrf_intensity**: Total magnetic field intensity from the IGRF model.
