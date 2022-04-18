@@ -11,6 +11,7 @@ This dependencies can be easily installed via [Anaconda](https://www.anaconda.co
 This can be done with the following commands:
 ```
 >> conda create -n magnetopy python=3.8 numpy pandas
+>> conda activate magnetopy
 ```
 
 ## Usage
@@ -42,3 +43,7 @@ Aditionally to the previous information, the `outputfile` will display the follo
 - **diff_time**: Time difference between the station measurement and the base station measurement.
 - **diurnal_var**: Diurnal variation of the magnetic field intensity.
 - **igrf_intensity**: Total magnetic field intensity from the IGRF model.
+
+## More information
+If you want to know more about how *MagnetoPy* works and you would like to see more examples, you can visit this link on my website where I explain *MagnetoPy* in more depth: 
+- [https://jcbucio.github.io/portafolio/MagnetoPy](https://jcbucio.github.io/portafolio/MagnetoPy)

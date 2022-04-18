@@ -81,8 +81,9 @@ except:
 # Change the columns names
 sta_file.columns = ['sta_date', 'sta_time', 'station', 'sta_field', 'sta_lat', 'sta_lon']
 
-# Check that the time format is correct and asign the new value to the time column
+# Check that the time and date formats are correct
 sta_file['sta_time'] = sta_file['sta_time'].apply(lambda x: format_time(x))
+# sta_file['sta_date'] = sta_file['sta_date'].apply(lambda x: format_date(x))
 
 
 ##################################### STATION FILE COLUMNS #####################################
@@ -120,6 +121,9 @@ except:
 
 base_file.columns = ['base_date', 'base_time', 'base_magfield', 'base_sq']
 
+# Check that the time and date formats are correct
+base_file['base_time'] = base_file['base_time'].apply(lambda x: format_time(x))
+# base_file['base_date'] = base_file['base_date'].apply(lambda x: format_date(x))
 
 ######################## FINAL DATA PROCESSING ########################
 print('Finding closest matches in time of base stations...')
@@ -129,12 +133,12 @@ base_file.insert(0, 'diff_time', np.nan)
 base_cols = base_file.columns
 final_data = final_data.assign(**dict.fromkeys(base_cols, np.nan))
 
-final_data['sta_time'] = final_data['sta_time'].astype(int)
-
 for i in range(len(final_data)):
     for date in base_file['base_date']:
         if final_data['sta_date'][i] == date:
-            closest_time = base_file.iloc[np.argmin(np.abs(base_file['base_time'] - final_data.loc[i, 'sta_time'])), :]
+            # Select the data from base_file that has the same date
+            base_file_date = base_file[base_file['base_date'] == date]
+            closest_time = base_file_date.iloc[np.argmin(np.abs(base_file_date['base_time'] - final_data.loc[i, 'sta_time'])), :]
             final_data.loc[i, 'base_date'] = closest_time['base_date']
             final_data.loc[i, 'base_time'] = closest_time['base_time']
             final_data.loc[i, 'base_magfield'] = closest_time['base_magfield']
@@ -148,6 +152,7 @@ final_data['diurnal_var'] = final_data['base_magfield'] - base_mean_magfield
 
 print('\nMatches and diurnal variation completed!\n')
 
+final_data.to_csv(out_file, index=False, sep=',', encoding='utf-8')
 
 ######################## IGRF API REQUEST ########################
 print('\nRequesting IGRF data...\n')
@@ -157,7 +162,9 @@ req_number = 0
 # Loop through the data and request the IGRF data
 for i in range(len(final_data)):
     req_number += 1
-    day, month, year = final_data['base_date'][i].split('/')
+
+    date = final_data['base_date'][i]
+    day, month, year = date.split('/')
 
     # Set the parameters for the request
     params = {
