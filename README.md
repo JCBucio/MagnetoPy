@@ -5,14 +5,14 @@
 Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
 *MagnetoPy* runs on Python 3.8+, with the following dependencies:
-[numpy](https://numpy.org/) | [pandas](https://pandas.pydata.org/) | [gpxpy](https://github.com/tkrajina/gpxpy)
+[numpy](https://numpy.org/) | [pandas](https://pandas.pydata.org/) | [requests](https://docs.python-requests.org/en/latest/) | [gpxpy](https://github.com/tkrajina/gpxpy)*optional
 
 **Note**: It is not necessary to install the package `gpxpy` to run *MagnetoPy*.
 
 This dependencies can be easily installed via [Anaconda](https://www.anaconda.com/) on the command line. I *highly* recommend using a virtual environment so that your *MagnetoPy* environment does not conflict with other Python packages.
 This can be done with the following commands:
 ```
->> conda create -n magnetopy python=3.8 numpy pandas
+>> conda create -n magnetopy python=3.8 numpy pandas requests
 >> conda activate magnetopy
 ```
 
