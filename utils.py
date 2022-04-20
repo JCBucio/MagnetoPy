@@ -67,3 +67,39 @@ def format_date(value):
         print(e)
         print('\n--- ERROR: The date format could not be processed ---\n')
         exit()
+
+# Function that formats the values of the route column
+def format_route(val):
+    try:
+        # Check if the value is a string
+        if str(val).isdigit() == False:
+            str_route = str(val)
+            if '#' in str_route:
+                route = str_route.replace('#', '')
+                return int(route)
+            else:
+                return int(str_route)
+        else:
+            return val
+    except:
+        print('\n--- ERROR: The route format is not correct ---\n')
+        exit()
+
+# Function that formats the values of the station column
+def format_station(val):
+    try:
+        # Check if the value is a string
+        if str(val).isdigit() == False:
+            str_station = str(val)
+            if '#' and '/' in str_station:
+                station = str_station.replace('#', '')
+                # Keep the last number of the string
+                station = station.split('/')[-1]
+                return int(station)
+            else:
+                return int(str_station)
+        else:
+            return val
+    except:
+        print('\n--- ERROR: The station format is not correct ---\n')
+        exit()
