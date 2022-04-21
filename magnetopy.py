@@ -148,57 +148,69 @@ for i in range(len(final_data)):
 
 ######################## DAY VARIATION PROCESSING ########################
 base_mean_magfield = base_file['base_magfield'].mean()
-final_data['diurnal_var'] = final_data['base_magfield'] - base_mean_magfield
+final_data['diurnal_var'] = np.abs(final_data['base_magfield'] - base_mean_magfield)
+final_data['diurnal_var_corr'] = final_data['sta_magfield'] - final_data['diurnal_var']
 
-print('\nMatches and diurnal variation completed!\n')
+print('\nData matching and correction for diurnal variation completed!\n')
 
 final_data.to_csv(out_file, index=False, sep=',', encoding='utf-8')
 
 ######################## IGRF API REQUEST ########################
-print('\nRequesting IGRF data...\n')
-api_url = 'https://www.ngdc.noaa.gov/geomag-web/calculators/calculateIgrfwmm'
-requests_time = time.time()
-req_number = 0
-# Loop through the data and request the IGRF data
-for i in range(len(final_data)):
-    req_number += 1
+try:
+    print('\nRequesting IGRF data...\n')
+    api_url = 'https://www.ngdc.noaa.gov/geomag-web/calculators/calculateIgrfwmm'
+    requests_time = time.time()
+    req_number = 0
+    # Loop through the data and request the IGRF data
+    for i in range(len(final_data)):
+        req_number += 1
 
-    date = final_data['base_date'][i]
-    day, month, year = date.split('/')
+        date = final_data['base_date'][i]
+        day, month, year = date.split('/')
 
-    # Set the parameters for the request
-    params = {
-        'lat1': final_data['gps_lat'][i],
-        'lon1': final_data['gps_lon'][i],
-        'coordinateSystem': 'D',
-        'model': 'IGRF',
-        'startYear': int(year),
-        'startMonth': int(month),
-        'startDay': int(day),
-        'endYear': int(year),
-        'endMonth': int(month),
-        'endDay': int(day),
-        'resultFormat': 'json'
-    }
-    # Request the data
-    response = requests.get(api_url, params=params)
-    # Check if the request was successful and print the number of the request every 10 requests
-    if response.status_code == 200:
-        if req_number % 10 == 0:
-            print('{} requests completed...'.format(req_number))
-            time.sleep(1)
-    else:
-        print('\n--- ERROR: Request #{} failed! ---\n'.format(req_number))
-        exit()
+        # Set the parameters for the request
+        params = {
+            'lat1': final_data['gps_lat'][i],
+            'lon1': final_data['gps_lon'][i],
+            'coordinateSystem': 'D',
+            'model': 'IGRF',
+            'startYear': int(year),
+            'startMonth': int(month),
+            'startDay': int(day),
+            'endYear': int(year),
+            'endMonth': int(month),
+            'endDay': int(day),
+            'resultFormat': 'json'
+        }
+        # Request the data
+        response = requests.get(api_url, params=params)
+        # Check if the request was successful and print the number of the request every 10 requests
+        if response.status_code == 200:
+            if req_number % 10 == 0:
+                print('{} requests completed...'.format(req_number))
+                time.sleep(1)
+        else:
+            print('\n--- ERROR: Request #{} failed! ---\n'.format(req_number))
+            exit()
 
-    # Add the response data to the final_data dataframe
-    response = response.json()
-    igrf_intensity = response['result'][0]['totalintensity']
-    final_data.loc[i, 'igrf_intensity'] = igrf_intensity
+        # Add the response data to the final_data dataframe
+        response = response.json()
+        igrf_intensity = response['result'][0]['totalintensity']
+        final_data.loc[i, 'igrf_intensity'] = igrf_intensity
 
 
-print('\n{} requests completed in {} minutes\n'.format(req_number, "{:.3f}".format((time.time() - requests_time)/60)))
+    print('\n{} requests completed in {} minutes\n'.format(req_number, "{:.3f}".format((time.time() - requests_time)/60)))
 
+except:
+    print('\n--- ERROR: IGRF service is not available ---\n')
+    print('Data succesfully saved without IGRF correction in: ' + out_file)
+    print('\nTotal time spent: {} minutes\n'.format("{:.3f}".format((time.time() - t)/60)))
+    exit()
+
+######################## IGRF CORRECTION ########################
+igrf_mean = final_data['igrf_intensity'].mean()
+final_data['igrf_var'] = np.abs(final_data['igrf_intensity'] - igrf_mean)
+final_data['igrf_var_corr'] = final_data['sta_magfield'] - final_data['igrf_var']
 
 ######################## OUTPUT ########################
 print('\n--- OUTPUT FILE ---\n')
