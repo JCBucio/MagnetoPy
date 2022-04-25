@@ -5,11 +5,11 @@
 Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
 *MagnetoPy* runs on Python 3.8+, with the following dependencies:
-[numpy](https://numpy.org/) | [pandas](https://pandas.pydata.org/) | [requests](https://docs.python-requests.org/en/latest/) | [gpxpy](https://github.com/tkrajina/gpxpy)*optional
+[numpy](https://numpy.org/){:target="_blank" rel="noopener noreferrer"} | [pandas](https://pandas.pydata.org/){:target="_blank" rel="noopener noreferrer"} | [requests](https://docs.python-requests.org/en/latest/){:target="_blank" rel="noopener noreferrer"} | [gpxpy](https://github.com/tkrajina/gpxpy){:target="_blank" rel="noopener noreferrer"}*optional
 
 **Note**: It is not necessary to install the package `gpxpy` to run *MagnetoPy*.
 
-This dependencies can be easily installed via [Anaconda](https://www.anaconda.com/) on the command line. I *highly* recommend using a virtual environment so that your *MagnetoPy* environment does not conflict with other Python packages.
+This dependencies can be easily installed via [Anaconda](https://www.anaconda.com/){:target="_blank" rel="noopener noreferrer"} on the command line. I *highly* recommend using a virtual environment so that your *MagnetoPy* environment does not conflict with other Python packages.
 This can be done with the following commands:
 ```
 >> conda create -n magnetopy python=3.8 numpy pandas requests
@@ -50,7 +50,7 @@ Aditionally to the previous information, the `outputfile` will display the follo
 - **igrf_var_corr**: Correction of total magnetic field variation from the IGRF model.
 
 ## Convert GPX files to CSV
-In addition, the repository has a program `gpx_convert.py` that helps us convert gpx files to csv in the event that our mobile stations have been processed in some software such as Google Earth or any GIS (Geographic Information System). To make use of the program you first need to install `gpxpy` once your conda environment is activated:
+In addition, the repository has a program `gpx_converter.py` that helps us convert gpx files to csv in the event that our mobile stations have been processed in some software such as Google Earth or any GIS (Geographic Information System). To make use of the program you first need to install `gpxpy` once your conda environment is activated:
 
 ```
 >> conda install -c conda-forge gpxpy
@@ -59,7 +59,7 @@ In addition, the repository has a program `gpx_convert.py` that helps us convert
 Now you can convert your gpx files to a csv with the following command:
 
 ```
->> python gpx_convert.py gpx_file csv_output_file
+>> python gpx_converter.py gpx_file csv_output_file
 ```
 
 ## More information

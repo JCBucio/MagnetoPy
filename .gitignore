@@ -1,6 +1,9 @@
 # MagnetoPy virtual environment
 magneto-env
 
+# Data files for testing
+data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
