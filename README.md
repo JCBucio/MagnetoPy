@@ -46,8 +46,7 @@ Aditionally to the previous information, the `outputfile` will display the follo
 - **diurnal_var**: Diurnal variation of the magnetic field intensity.
 - **diurnal_var_corr**: Correction of diurnal variation.
 - **igrf_intensity**: Total magnetic field intensity from the IGRF model.
-- **igrf_var**: Total magnetic field variation from the IGRF model.
-- **igrf_var_corr**: Correction of total magnetic field variation from the IGRF model.
+- **igrf_res_field**: Residual magnetic field calculated with the total magnetic field intensity from the IGRF model.
 
 ## Convert GPX files to CSV
 In addition, the repository has a program `gpx_converter.py` that helps us convert gpx files to csv in the event that our mobile stations have been processed in some software such as Google Earth or any GIS (Geographic Information System). To make use of the program you first need to install `gpxpy` once your conda environment is activated:

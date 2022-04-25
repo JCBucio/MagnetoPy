@@ -144,11 +144,12 @@ for i in range(len(final_data)):
             final_data.loc[i, 'base_magfield'] = closest_time['base_magfield']
             final_data.loc[i, 'base_sq'] = closest_time['base_sq']
             final_data.loc[i, 'diff_time'] = final_data.loc[i, 'sta_time'] - final_data.loc[i, 'base_time']
+            final_data.loc[i, 'base_magfield_mean'] = np.mean(base_file_date['base_magfield'])
 
 
 ######################## DAY VARIATION PROCESSING ########################
-base_mean_magfield = base_file['base_magfield'].mean()
-final_data['diurnal_var'] = np.abs(final_data['base_magfield'] - base_mean_magfield)
+# base_mean_magfield = base_file['base_magfield'].mean()
+final_data['diurnal_var'] = final_data['base_magfield'] - final_data['base_magfield_mean']
 final_data['diurnal_var_corr'] = final_data['sta_magfield'] - final_data['diurnal_var']
 
 print('\nData matching and correction for diurnal variation completed!\n')
@@ -208,9 +209,7 @@ except:
     exit()
 
 ######################## IGRF CORRECTION ########################
-igrf_mean = final_data['igrf_intensity'].mean()
-final_data['igrf_var'] = np.abs(final_data['igrf_intensity'] - igrf_mean)
-final_data['igrf_var_corr'] = final_data['sta_magfield'] - final_data['igrf_var']
+final_data['igrf_res_field'] = final_data['diurnal_var_corr'] - final_data['igrf_intensity']
 
 ######################## OUTPUT ########################
 print('\n--- OUTPUT FILE ---\n')
