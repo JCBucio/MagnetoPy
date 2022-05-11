@@ -203,7 +203,7 @@ try:
     print('\n{} requests completed in {} minutes\n'.format(req_number, "{:.3f}".format((time.time() - requests_time)/60)))
 
 except:
-    print('\n--- ERROR: IGRF service is not available ---\n')
+    print('--- ERROR: IGRF service is not available ---\n')
     print('Data succesfully saved without IGRF correction in: ' + out_file)
     print('\nTotal time spent: {} minutes\n'.format("{:.3f}".format((time.time() - t)/60)))
     exit()
