@@ -65,21 +65,21 @@ print('\n--- STATIONS FILE PARAMETERS ---\n')
 print('Enter the columns names of the file')
 sta_date = str(input("Date column: "))
 sta_time = str(input("Time column: "))
-sta_station = str(input("Stations column: "))
+# sta_station = str(input("Stations column: "))
 sta_field = str(input("Magnetic field column: "))
 sta_lat = str(input("Latitude column: "))
 sta_lon = str(input("Longitude column: "))
 
 # Check that the columns exist
 try:
-    sta_file = sta_file[[sta_date, sta_time, sta_station, sta_field, sta_lat, sta_lon]]
+    sta_file = sta_file[[sta_date, sta_time, sta_field, sta_lat, sta_lon]]
     print('\nColumns found!\n')
 except:
     print('\n--- ERROR: Some columns were not found, check your columns names ---\n')
     exit()
 
 # Change the columns names
-sta_file.columns = ['sta_date', 'sta_time', 'station', 'sta_field', 'sta_lat', 'sta_lon']
+sta_file.columns = ['sta_date', 'sta_time', 'sta_field', 'sta_lat', 'sta_lon']
 
 # Check that the time and date formats are correct
 sta_file['sta_time'] = sta_file['sta_time'].apply(lambda x: format_time(x))
@@ -109,17 +109,16 @@ print('Enter the columns names of the file')
 base_date = str(input("Date column: "))
 base_time = str(input("Time column: "))
 base_field = str(input("Magnetic field column: "))
-base_sq = str(input("Resolution column: "))
 
 # Check that the columns exist
 try:
-    base_file = base_file[[base_date, base_time, base_field, base_sq]]
+    base_file = base_file[[base_date, base_time, base_field]]
     print('\nColumns found!\n')
 except:
     print('\n--- ERROR: Some columns were not found, check your columns names ---\n')
     exit()
 
-base_file.columns = ['base_date', 'base_time', 'base_magfield', 'base_sq']
+base_file.columns = ['base_date', 'base_time', 'base_magfield']
 
 # Check that the time and date formats are correct
 base_file['base_time'] = base_file['base_time'].apply(lambda x: format_time(x))
@@ -128,7 +127,7 @@ base_file['base_time'] = base_file['base_time'].apply(lambda x: format_time(x))
 ######################## FINAL DATA PROCESSING ########################
 print('Finding closest matches in time of base stations...')
 final_data = sta_file.copy()
-final_data.columns = ['sta_date', 'sta_time', 'station', 'sta_magfield', 'gps_lat', 'gps_lon']
+final_data.columns = ['sta_date', 'sta_time', 'sta_magfield', 'gps_lat', 'gps_lon']
 base_file.insert(0, 'diff_time', np.nan)
 base_cols = base_file.columns
 final_data = final_data.assign(**dict.fromkeys(base_cols, np.nan))
@@ -142,7 +141,6 @@ for i in range(len(final_data)):
             final_data.loc[i, 'base_date'] = closest_time['base_date']
             final_data.loc[i, 'base_time'] = closest_time['base_time']
             final_data.loc[i, 'base_magfield'] = closest_time['base_magfield']
-            final_data.loc[i, 'base_sq'] = closest_time['base_sq']
             final_data.loc[i, 'diff_time'] = final_data.loc[i, 'sta_time'] - final_data.loc[i, 'base_time']
             final_data.loc[i, 'base_magfield_mean'] = np.mean(base_file_date['base_magfield'])
 
