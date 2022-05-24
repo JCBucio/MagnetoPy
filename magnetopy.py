@@ -1,4 +1,3 @@
-import argparse
 import pandas as pd
 import numpy as np
 from utils import *
@@ -10,12 +9,7 @@ Run this script to obtain the magnetic field data per station from a base statio
 and save the data in a csv file that contains the corrections needed. Aditionally, 
 the script can request the IGRF data for every point in our stations and base files.
 
-usage: magnetopy.py [-h] stationsfile basefile outputfile
-
-positional arguments:
-    stationsfile    name of the file with the stations data
-    basefile        name of the file with the base stations data
-    outputfile      name of the file with the output data
+usage: magnetopy.py [-h]
 
 optional arguments:
     -h, --help      show this help message and exit
@@ -33,6 +27,7 @@ print(intro)
 
 t = time.time()
 
+print('\n--- FILES NAMES PARAMETERS ---\n')
 try:
     sta_file = str(input("Stations file name and path: "))
     sta_file = pd.read_csv(sta_file, encoding='utf-8')

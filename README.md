@@ -4,24 +4,14 @@
 ## Installation
 Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git clone` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
-*MagnetoPy* runs on Python 3.8+, with the following dependencies:
-[numpy](https://numpy.org/) | [pandas](https://pandas.pydata.org/) | [requests](https://docs.python-requests.org/en/latest/) | [gpxpy](https://github.com/tkrajina/gpxpy)*optional
+From the files that will get downloaded, you only need the `magnetopy.exe` file. You can put this file wherever you want in your filesystem, you can add it to your desktop for convenience purposes. The rest of the files are the source code of the program.
 
-**Note**: It is not necessary to install the package `gpxpy` to run *MagnetoPy*.
-
-This dependencies can be easily installed via [Anaconda](https://www.anaconda.com/) on the command line. I *highly* recommend using a virtual environment so that your *MagnetoPy* environment does not conflict with other Python packages.
-This can be done with the following commands:
+## Usage for Windows
+To check if *MagnetoPy* was installed correctly, simply double click the `magnetopy.exe` file or run the following command from the working directory where the program is located:
 ```
->> conda create -n magnetopy python=3.8 numpy pandas requests
->> conda activate magnetopy
+magnetopy.exe
 ```
-
-## Usage
-To check if *MagnetoPy* was installed correctly, simply run the following command:
-```
->> python magnetopy.py
-```
-If the dependencies were installed correctly you should see the following output:
+If the dependencies were installed correctly you should see a command line opened with the following output:
 ```
 ############## MAGNETIC FIELD DATA FORMATTER ##############
 ##                                                       ##  
@@ -30,10 +20,11 @@ If the dependencies were installed correctly you should see the following output
 ##                                                       ##
 ###########################################################
 
-usage: magnetopy.py [-h] stationsfile basefile outputfile
-magnetopy.py: error: the following arguments are required: stationsfile, basefile, outputfile
+--- FILES NAMES PARAMETERS ---
+
+Stations file name and path:
 ```
-If you get any other output, you should check the dependencies in your conda virtual environment.
+If you don't see a command line opened, please inform about the problem to the author.
 
 ### Processing magnetic data
 To begin with the processing of magnetic data, we must pass to *MagnetoPy* the following parameters:
@@ -41,6 +32,8 @@ To begin with the processing of magnetic data, we must pass to *MagnetoPy* the f
 - **`stationsfile`**: Path to the file containing the magnetic data files from field stations.
 - **`basefile`**: Path to the file containing the magnetic data files from base stations.
 - **`outputfile`**: Path to the file where the output will be saved.
+
+**NOTE:** It is important to check that your files have `UTF-8` enconding.
 
 The `stationsfile` must contain the following columns:
 - **date**: Date of the measurement in DD/MM/YYYY format.
