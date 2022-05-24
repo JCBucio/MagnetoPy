@@ -33,28 +33,22 @@ print(intro)
 
 t = time.time()
 
-parser = argparse.ArgumentParser(description='Magnetic Field Data Formatter')
-parser.add_argument('stationsfile', type=str, help='Enter the name of the stations file with extension')
-parser.add_argument('basefile', type=str, help='Enter the name of the base stations file with extension')
-parser.add_argument('outputfile', type=str, help='Enter the name of the output file with extension')
-args = parser.parse_args()
-
 try:
-    sta_file = args.stationsfile
-    sta_file = pd.read_csv(sta_file)
+    sta_file = str(input("Stations file name and path: "))
+    sta_file = pd.read_csv(sta_file, encoding='utf-8')
 except:
     print('\n--- ERROR: No stations file was entered ---\n')
     exit()
 
 try:
-    base_file = args.basefile
-    base_file = pd.read_csv(base_file)
+    base_file = str(input("Base stations file name and path: "))
+    base_file = pd.read_csv(base_file, encoding='utf-8')
 except:
     print('\n--- ERROR: No base stations file was entered ---\n')
     exit()
 
 try:
-    out_file = args.outputfile
+    out_file = str(input("Output file name and path: "))
 except:
     print('\n--- ERROR: No output file was entered ---\n')
     exit()
@@ -65,7 +59,6 @@ print('\n--- STATIONS FILE PARAMETERS ---\n')
 print('Enter the columns names of the file')
 sta_date = str(input("Date column: "))
 sta_time = str(input("Time column: "))
-# sta_station = str(input("Stations column: "))
 sta_field = str(input("Magnetic field column: "))
 sta_lat = str(input("Latitude column: "))
 sta_lon = str(input("Longitude column: "))
@@ -119,6 +112,7 @@ except:
     exit()
 
 base_file.columns = ['base_date', 'base_time', 'base_magfield']
+base_file.insert(0, 'base_magfield_mean', np.nan)
 
 # Check that the time and date formats are correct
 base_file['base_time'] = base_file['base_time'].apply(lambda x: format_time(x))
