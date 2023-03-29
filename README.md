@@ -4,7 +4,7 @@
 ## Installation
 Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git clone` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
-- **Important:** To get the `magnetopy.exe` file please contact me to jcbucio.geo@gmail.com, withot this file you will have to install the dependencies and run the program with the `magnetopy.py` file.
+- **Important:** To get the `magnetopy.exe` file please contact me to jcbucio.geo@gmail.com, without this file you will have to install the dependencies and run the program with the `magnetopy.py` file.
 
 Once you have the executable file you can put it wherever you want in your filesystem, you can add it to your desktop for convenience purposes. The rest of the files are the source code of the program.
 
@@ -28,7 +28,7 @@ Stations file name and path:
 ```
 If you don't see a command line opened, please inform about the problem to the author.
 
-## Running from the source code
+## Running from the source code in Linux
 If you want to run the program from the source code, you must first install the dependencies. To do this, you must have [Python 3.8](https://www.python.org/downloads/) or a higher version installed on your computer. Once you have installed Python, you must clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`) with the following command, then go to the created working directory:
 ```
 git clone https://github.com/JCBucio/MagnetoPy.git
