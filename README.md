@@ -4,7 +4,9 @@
 ## Installation
 Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git clone` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
-From the files that will get downloaded, you only need the `magnetopy.exe` file. You can put this file wherever you want in your filesystem, you can add it to your desktop for convenience purposes. The rest of the files are the source code of the program.
+- **Important:** To get the `magnetopy.exe` file please contact me to jcbucio.geo@gmail.com, withot this file you will have to install the dependencies and run the program with the `magnetopy.py` file.
+
+Once you have the executable file you can put it wherever you want in your filesystem, you can add it to your desktop for convenience purposes. The rest of the files are the source code of the program.
 
 ## Usage for Windows
 To check if *MagnetoPy* was installed correctly, simply double click the `magnetopy.exe` file or run the following command from the working directory where the program is located:
@@ -25,6 +27,33 @@ If the dependencies were installed correctly you should see a command line opene
 Stations file name and path:
 ```
 If you don't see a command line opened, please inform about the problem to the author.
+
+## Running from the source code
+If you want to run the program from the source code, you must first install the dependencies. To do this, you must have [Python 3.8](https://www.python.org/downloads/) or a higher version installed on your computer. Once you have installed Python, you must clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`) with the following command, then go to the created working directory:
+```
+git clone https://github.com/JCBucio/MagnetoPy.git
+cd MagnetoPy
+```
+
+Now you must create a virtual environment with the following command:
+```
+python3 -m venv magnetopy_env
+```
+
+Activate the virtual environment with the following command:
+```
+source magnetopy_env/bin/activate
+```
+
+Install the dependencies with the following command:
+```
+pip install -r requirements.txt
+```
+
+Finally, run the program with the following command:
+```
+python3 magnetopy.py
+```
 
 ### Processing magnetic data
 To begin with the processing of magnetic data, we must pass to *MagnetoPy* the following parameters:
@@ -54,19 +83,6 @@ Aditionally to the previous information, the `outputfile` will display the follo
 - **diurnal_var_corr**: Correction of diurnal variation.
 - **igrf_intensity**: Total magnetic field intensity from the IGRF model.
 - **igrf_res_field**: Residual magnetic field calculated with the total magnetic field intensity from the IGRF model.
-
-## Convert GPX files to CSV
-In addition, the repository has a program `gpx_converter.py` that helps us convert gpx files to csv in the event that our mobile stations have been processed in some software such as Google Earth or any GIS (Geographic Information System). To make use of the program you first need to install `gpxpy` once your conda environment is activated:
-
-```
->> conda install -c conda-forge gpxpy
-```
-
-Now you can convert your gpx files to a csv with the following command:
-
-```
->> python gpx_converter.py gpx_file csv_output_file
-```
 
 ## More information
 If you want to know more about how *MagnetoPy* works and you would like to see more examples, you can visit this link on my website where I explain *MagnetoPy* in more depth: 

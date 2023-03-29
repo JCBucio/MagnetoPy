@@ -1,6 +1,5 @@
 certifi==2021.10.8
 charset-normalizer==2.0.12
-gpxpy==1.5.0
 idna==3.3
 numpy==1.22.3
 pandas==1.4.2
