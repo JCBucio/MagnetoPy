@@ -11,7 +11,7 @@ MagnetoPy help:
     --help
 
 ```sh
-python <repository_path>\magnetopy\src\magnetopy\magnetopy_cli\magnetopy.py --help
+python magnetopy.py --help
 ```
 
 Help by command:
@@ -19,7 +19,7 @@ Help by command:
     diurnal-variation --help
 
 ```sh
-python <repository_path>\magnetopy\src\magnetopy\magnetopy_cli\magnetopy.py <command> --help
+python magnetopy.py <command> --help
 ```
 
 ---
