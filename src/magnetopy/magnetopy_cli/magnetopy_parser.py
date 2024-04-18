@@ -41,7 +41,7 @@ class MagnetopyParser:
         diurnal_variation.add_argument(
             '--stations_cols',
             type=str,
-            help='Stations file columns names separated by commas (required).',
+            help='Stations file columns names separated by commas without spaces (required). In the following order: date,time,latitude,longitude,magnetic_field.',
             required=True
         )
         diurnal_variation.add_argument(
@@ -53,7 +53,7 @@ class MagnetopyParser:
         diurnal_variation.add_argument(
             '--base_station_cols',
             type=str,
-            help='Base station file columns names separated by commas (required).',
+            help='Base station file columns names separated by commas (required). In the following order: date,time,magnetic_field.',
             required=True
         )
     

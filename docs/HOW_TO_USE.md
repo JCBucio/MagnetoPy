@@ -33,9 +33,9 @@ ___
     MagnetoPy command that calculate the diurnal variation using field data and base station registers.
 
     --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).
-    --stations_cols <value>         Stations file columns names in the following order: date, time, magfield, latitude and longitude (required).
+    --stations_cols <value>         Stations file columns names in the following order: date, time, latitude, longitude and magnetic_field (required).
     --base_station_file <value>     Base station file path containing date, time and magfield of the study (required).
-    --base_stations_cols <value>    Base station columns names in the following order: date, time and magfield (required).
+    --base_stations_cols <value>    Base station columns names in the following order: date, time and magnetic_field (required).
 
 ___
 ### calculate-igrf
