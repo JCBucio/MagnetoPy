@@ -11,7 +11,7 @@ from src.magnetopy.magnetopy_cli.magnetopy_parser import MagnetopyParser
 class Magnetopy:
     
     def __init__(self):
-        self.magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='magnetopy')
+        self.magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPy')
 
         self.__parser: MagnetopyParser = MagnetopyParser()
         self.__arguments: Namespace = self.__parser.get_arguments()
@@ -21,7 +21,7 @@ class Magnetopy:
 
     def __magnetopy_flow(self) -> None:
         """
-        Runs the MagnetoPy validation flow depending o the command.
+        Runs the MagnetoPy validation flow depending on the command.
 
         :return: Nothing to return
         :rtype: None
@@ -47,7 +47,7 @@ class Magnetopy:
             arguments_str += f'{argument_name}: {argument_value}\n'
 
         banner = f'''
-############## MAGNETIC FIELD DATA FORMATTER ##############
+######################## MAGNETOPY ########################
 ##                                                       ##  
 ##  Written by Juan Carlos Bucio (jcbucio.geo@gmail.com) ##
 ##               Licensed under MIT license              ##
@@ -55,7 +55,6 @@ class Magnetopy:
 ###########################################################
 
 {arguments_str}
-
 ###########################################################
         '''
 

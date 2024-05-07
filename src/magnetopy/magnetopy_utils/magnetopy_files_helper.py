@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from datetime import datetime
 from logging import getLogger
@@ -68,3 +69,42 @@ class MagnetoPyFilesHelper:
             return None
 
         return df[columns]
+    
+    @staticmethod
+    def rename_columns(stations_df, base_station_df):
+        """
+        This function renames the columns in the given dataframes adding sta_ and base_ prefixes.
+        
+        :param stations_df: pd.DataFrame
+        :param base_station_df: pd.DataFrame
+        :return: pd.DataFrame, pd.DataFrame
+        """
+        magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyFilesHelper: rename_columns')
+        stations_df.columns = ['sta_' + col for col in stations_df.columns]
+        base_station_df.columns = ['base_' + col for col in base_station_df.columns]
+        magnetopy_logging.info(f'New station columns: {stations_df.columns}')
+        magnetopy_logging.info(f'New base station columns: {base_station_df.columns}')
+
+        return stations_df, base_station_df
+    
+    @staticmethod
+    def save_data(result_df, project_name) -> None:
+        """
+        Save the resulting dataframe with the calculations performed.
+
+        :param result_df: DataFrame
+        :param project_name: str
+        :return: Nothing to return
+        :rtype: None
+        """
+        magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyFilesHelper: save_data')
+        resources_full_path = os.path.abspath('resources')
+        new_folder_path = os.path.join(resources_full_path, project_name)
+        os.makedirs(new_folder_path, exist_ok=True)
+        magnetopy_logging.info(f'Writing output data on path: {new_folder_path}')
+        
+        time: str = str(datetime.now()).split('.')[0].replace(' ', '_').replace(':', '')
+        file = f'{project_name}_{time}.csv'
+        full_path = os.path.abspath(str(os.path.join(new_folder_path, file)))
+
+        result_df.to_csv(full_path)

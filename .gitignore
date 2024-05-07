@@ -4,6 +4,13 @@ magneto-env
 # Data files for testing
 data/
 
+# Ignore the folders in the resources folder except for the data_examples folder
+resources/*
+!resources/data_examples
+
+# Ignore the .idea folder
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

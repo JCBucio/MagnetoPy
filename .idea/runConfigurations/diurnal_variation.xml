@@ -10,7 +10,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/magnetopy.py" />
-    <option name="PARAMETERS" value="diurnal-variation --stations_file C:\Users\Bluetab\Documents\Tesis-MagnetoPy\MagnetoPy\resources\data_examples\cerritos_datos_estaciones.csv --stations_cols date,time,gpslat,gpslon,magfield --base_station_file C:\Users\Bluetab\Documents\Tesis-MagnetoPy\MagnetoPy\resources\data_examples\cerritos_estaciones_base.csv --base_station_cols date,time,nT" />
+    <option name="PARAMETERS" value="diurnal-variation --project_name cerritos --stations_file C:\Users\Bluetab\Documents\Tesis-MagnetoPy\MagnetoPy\resources\data_examples\cerritos_datos_estaciones.csv --stations_cols date,time,gpslat,gpslon,magfield --base_station_file C:\Users\Bluetab\Documents\Tesis-MagnetoPy\MagnetoPy\resources\data_examples\cerritos_estaciones_base.csv --base_station_cols date,time,nT" />
     <option name="SHOW_COMMAND_LINE" value="true" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

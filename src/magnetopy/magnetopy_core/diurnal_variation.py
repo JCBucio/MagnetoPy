@@ -9,6 +9,7 @@ class DiurnalVariation:
     def __init__(self, arguments: Namespace):
         self.__magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='DiurnalVariation')
 
+        self.project_name: str = arguments.project_name
         self.stations_file: str = arguments.stations_file
         self.stations_cols: str = arguments.stations_cols
         self.base_station_file: str = arguments.base_station_file
@@ -25,6 +26,7 @@ class DiurnalVariation:
         """
         self.__magnetopy_logging.info('Validating datasets and columns')
 
+        _project_name = self.project_name
         _stations_file_path = self.stations_file
         _stations_cols = self.stations_cols.split(',')
         _base_station_file_path = self.base_station_file
@@ -40,15 +42,18 @@ class DiurnalVariation:
         base_stations_df[_base_station_cols[0]] = base_stations_df[_base_station_cols[0]].apply(lambda x: MagnetoPyFilesHelper.validate_date(x))
         base_stations_df[_base_station_cols[1]] = base_stations_df[_base_station_cols[1]].apply(lambda x: MagnetoPyFilesHelper.validate_time(x))
         base_stations_df['datetime'] = pd.to_datetime(base_stations_df[_base_station_cols[0]] + ' ' + base_stations_df[_base_station_cols[1]])
+        base_stations_df['magfield_mean'] = base_stations_df.groupby(base_stations_df[_base_station_cols[0]])[_base_station_cols[2]].transform('mean')
+
+        stations_df, base_stations_df = MagnetoPyFilesHelper.rename_columns(stations_df, base_stations_df)
         
         self.__magnetopy_logging.info('Performing the diurnal variation correction')
 
         records = []
 
         for index, row in stations_df.iterrows():
-            stations_datetime = row['datetime']
+            stations_datetime = row['sta_datetime']
 
-            base_stations_df['time_diff'] = abs(base_stations_df['datetime'] - stations_datetime)
+            base_stations_df['time_diff'] = abs(base_stations_df['base_datetime'] - stations_datetime)
 
             closest_index = base_stations_df['time_diff'].idxmin()
             closest_record = base_stations_df.loc[closest_index]
@@ -56,11 +61,15 @@ class DiurnalVariation:
             records.append(closest_record)
 
         result_df = pd.DataFrame(records)
+        result_df = result_df.reset_index(drop=True)
 
-        print(result_df.head())
+        result_df = pd.concat([stations_df, result_df], axis=1)
+
+        result_df['diurnal_var'] = result_df['base_' + _base_station_cols[2]] - result_df['base_magfield_mean']
+        result_df['diurnal_var_corr'] = result_df['sta_' + _stations_cols[4]] - result_df['diurnal_var']
 
         self.__magnetopy_logging.info(f'Total records: {len(result_df)}')
 
-        self.__magnetopy_logging.info('Diurnal variation correction completed')
+        MagnetoPyFilesHelper.save_data(result_df, _project_name)
 
-        return result_df
+        self.__magnetopy_logging.info('Diurnal variation correction completed')

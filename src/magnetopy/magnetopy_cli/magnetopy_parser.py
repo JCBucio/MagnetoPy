@@ -33,6 +33,12 @@ class MagnetopyParser:
             help='MagnetoPy command that calculates the diurnal variation in a dataset.'
         )
         diurnal_variation.add_argument(
+            '--project_name',
+            type=str,
+            help='Project name (without spaces or special characters) to name the folder where the output will be saved (required).',
+            required=True
+        )
+        diurnal_variation.add_argument(
             '--stations_file',
             type=str,
             help='Stations file path (required).',
@@ -67,6 +73,12 @@ class MagnetopyParser:
         calculate_igrf = self.__subparsers.add_parser(
             'calculate-igrf',
             help='Command that performs the IGRF correction to a data set based on the 13th generation coefficients.'
+        )
+        calculate_igrf.add_argument(
+            '--project_name',
+            type=str,
+            help='Project name (without spaces or special characters) to name the folder where the output will be saved (required).',
+            required=True
         )
         calculate_igrf.add_argument(
             '--stations_file',
