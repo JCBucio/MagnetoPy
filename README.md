@@ -1,88 +1,74 @@
 # Overview
-*MagnetoPy* is a Python script that calculates diurnal variation and requests total magnetic field intensity from an IGRF API using field data and base stations.
+
+MagnetoPy is an open-source Command Line Interface (CLI) written in Python, designed to process magnetic data. With a robust set of commands, MagnetoPy aims to simplify the analysis and manipulation of magnetic data for geophysicists in the field.
+
+## Features
+
+- **Diurnal variation correction**: MagnetoPy command that calculate the diurnal variation using field and base station data.
+
+- **IGRF correction**: MagnetoPy command that calculate the total magnetic field intensity from the IGRF coefficients using field data and base stations.
+
+- **Reduction to the Pole (RTP)**: MagnetoPy command that compute the reduction to the pole of magnetic data using frequency domain calculations through Fast Fourier Transform.
 
 ## Installation
-Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) or use `git clone` to clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`). All scripts will be run from this directory, and all new files will be generated here.
 
-- **Important:** To get the `magnetopy.exe` file please contact me to jcbucio.geo@gmail.com, without this file you will have to install the dependencies and run the program with the `magnetopy.py` file.
+Before installing MagnetoPy, ensure you have Python 3.11 or higher installed on your system.
 
-Once you have the executable file you can put it wherever you want in your filesystem, you can add it to your desktop for convenience purposes. The rest of the files are the source code of the program.
+1. Download the [zip file](https://github.com/JCBucio/MagnetoPy/archive/refs/heads/main.zip) of the project or `git clone` the repository to a working directory (e.g., `/Users/jcbucio/tools/`). All commands will be run from this directory, and all new files will be generated here.
+2. Open a command prompt or terminal and navigate to the project folder.
+3. Create a virtual environment with the desired name:
 
-## Usage for Windows
-To check if *MagnetoPy* was installed correctly, simply double click the `magnetopy.exe` file or run the following command from the working directory where the program is located:
-```
-magnetopy.exe
-```
-If the dependencies were installed correctly you should see a command line opened with the following output:
-```
-############## MAGNETIC FIELD DATA FORMATTER ##############
-##                                                       ##  
-##  Written by Juan Carlos Bucio (jcbucio.geo@gmail.com) ##
-##               Licensed under MIT license              ##
-##                                                       ##
-###########################################################
-
---- FILES NAMES PARAMETERS ---
-
-Stations file name and path:
-```
-If you don't see a command line opened, please inform about the problem to the author.
-
-## Running from the source code in Linux
-If you want to run the program from the source code, you must first install the dependencies. To do this, you must have [Python 3.8](https://www.python.org/downloads/) or a higher version installed on your computer. Once you have installed Python, you must clone the repository to a working directory (e.g., `/Users/jcbucio/MagnetoPy/`) with the following command, then go to the created working directory:
-```
-git clone https://github.com/JCBucio/MagnetoPy.git
-cd MagnetoPy
+```bash
+python -m venv magnetopy_env
 ```
 
-Now you must create a virtual environment with the following command:
-```
-python3 -m venv magnetopy_env
+4. Activate the virtual environment:
+
+For Windows:
+```bash
+magnetopy_env\Scripts\activate
 ```
 
-Activate the virtual environment with the following command:
-```
+For Linux:
+```bash
 source magnetopy_env/bin/activate
 ```
 
-Install the dependencies with the following command:
-```
-pip install -r requirements.txt
-```
+5. Install the project dependencies using the requirements.txt file:
 
-Finally, run the program with the following command:
-```
-python3 magnetopy.py
+```bash
+python -m pip install -r requirements.txt
 ```
 
-### Processing magnetic data
-To begin with the processing of magnetic data, we must pass to *MagnetoPy* the following parameters:
+6. Verify the installation by running the following command:
 
-- **`stationsfile`**: Path to the file containing the magnetic data files from field stations.
-- **`basefile`**: Path to the file containing the magnetic data files from base stations.
-- **`outputfile`**: Path to the file where the output will be saved.
+```bash
+python magnetopy.py
+```
 
-**NOTE:** It is important to check that your files have `UTF-8` enconding.
+If successful, you should see the usage information for MagnetoPy. If not, please review the installation steps or contact me to [jcbucio.geo@gmail.com](mailto:jcbucio.geo@gmail.com) for assistance.
 
-The `stationsfile` must contain the following columns:
-- **date**: Date of the measurement in DD/MM/YYYY format.
-- **time**: Time of the measurement in HH:MM:SS format.
-- **magfield**: Magnetic field intensity in nT from each station.
-- **lat**: Latitude of the station in decimal degrees.
-- **lon**: Longitude of the station in decimal degrees.
+## Usage
 
-The `basefile` must contain the following columns:
-- **date**: Date of the measurement in DD/MM/YYYY format.
-- **time**: Time of the measurement in HH:MM:SS format.
-- **magfield**: Magnetic field intensity in nT from each base station measurement.
+To start using MagnetoPy, simply run the CLI and explore the available commands:
 
-Aditionally to the previous information, the `outputfile` will display the following data:
-- **diff_time**: Time difference between the station measurement and the base station measurement.
-- **base_magfield_mean**: Mean magnetic field intensity from the base stations for one day.
-- **diurnal_var**: Diurnal variation of the magnetic field intensity.
-- **diurnal_var_corr**: Correction of diurnal variation.
-- **igrf_intensity**: Total magnetic field intensity from the IGRF model.
-- **igrf_res_field**: Residual magnetic field calculated with the total magnetic field intensity from the IGRF model.
+```bash
+python magnetopy.py
+```
+
+For detailed usage instructions and command documentation, refer to the [Documentation](https://github.com/JCBucio/MagnetoPy/docs).
+
+## Contributing
+
+Contributions to MagnetoPy are welcome! Whether you want to report a bug, request a feature, or submit a pull request, please refer to the [Contribution Guidelines](https://github.com/JCBucio/MagnetoPy/CONTRIBUTING.md).
+
+## License
+
+MagnetoPy is licensed under the MIT License. See [LICENSE](https://github.com/JCBucio/MagnetoPy/LICENSE) for more information.
+
+## Contact
+
+For questions, feedback, or support, feel free to contact me at [jcbucio.geo@gmail.com](mailto:jcbucio.geo@gmail.com).
 
 ## More information
 If you want to know more about how *MagnetoPy* works and you would like to see more examples, you can visit this link on my website where I explain *MagnetoPy* in more depth: 
