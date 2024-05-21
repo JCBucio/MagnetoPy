@@ -108,3 +108,27 @@ class MagnetoPyFilesHelper:
         full_path = os.path.abspath(str(os.path.join(new_folder_path, file)))
 
         result_df.to_csv(full_path)
+
+    @staticmethod
+    def load_igrf_coefficients() -> pd.DataFrame:
+        """
+        Load the IGRF coefficients from the resources/igrf13 folder.
+
+        :return: pd.DataFrame
+        """
+        magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyFilesHelper: load_igrf_coefficients')
+        resources_full_path = os.path.abspath('resources')
+        igrf_folder_path = os.path.join(resources_full_path, 'igrf13')
+        magnetopy_logging.info(f'Loading IGRF coefficients from path: {igrf_folder_path}')
+        igrf_file_path = os.path.join(igrf_folder_path, 'igrf13coeffs.csv')
+        try:
+            # The columns names are in the 4th row of the file
+            igrf_df = pd.read_csv(igrf_file_path, skiprows=3)
+        except FileNotFoundError:
+            magnetopy_logging.error(f'Error: File not found at path: "{igrf_file_path}"')
+            return None
+        except Exception as e:
+            magnetopy_logging.error(f'Error: "{e}"')
+            return None
+        
+        return igrf_df

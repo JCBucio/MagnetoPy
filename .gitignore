@@ -7,6 +7,7 @@ data/
 # Ignore the folders in the resources folder except for the data_examples folder
 resources/*
 !resources/data_examples
+!resources/igrf13
 
 # Ignore the .idea folder
 .idea/

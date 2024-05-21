@@ -3,6 +3,7 @@ from logging import getLogger
 import pandas as pd
 
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
+from src.magnetopy.magnetopy_utils.magnetopy_files_helper import MagnetoPyFilesHelper
 
 class CalculateIGRF:
     def __init__(self, arguments: Namespace):
@@ -25,5 +26,12 @@ class CalculateIGRF:
         _stations_file_path = self.stations_file
         _stations_cols = self.stations_cols.split(',')
 
-        self.__magnetopy_logging.info(f'Stations file path: {str(_stations_file_path)}')
-        self.__magnetopy_logging.info(f'Stations columns: {str(_stations_cols)}')
+        igrf_df = MagnetoPyFilesHelper.load_igrf_coefficients()
+
+        # Show the first 5 rows of the IGRF coefficients
+        self.__magnetopy_logging.info(f'First 5 rows of the IGRF coefficients:\n{igrf_df.head()}')
+
+        # Show columns of the IGRF coefficients
+        self.__magnetopy_logging.info(f'IGRF coefficients columns:\n{igrf_df.columns}')
+
+        return None
