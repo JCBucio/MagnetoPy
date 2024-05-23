@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 from datetime import datetime
 from logging import getLogger
@@ -112,7 +113,7 @@ class MagnetoPyFilesHelper:
     @staticmethod
     def load_igrf_coefficients() -> pd.DataFrame:
         """
-        Load the IGRF coefficients from the resources/igrf13 folder.
+        Load the IGRF coefficients from the resources/igrf13/igrf13coeffs.csv file.
 
         :return: pd.DataFrame
         """
@@ -122,7 +123,6 @@ class MagnetoPyFilesHelper:
         magnetopy_logging.info(f'Loading IGRF coefficients from path: {igrf_folder_path}')
         igrf_file_path = os.path.join(igrf_folder_path, 'igrf13coeffs.csv')
         try:
-            # The columns names are in the 4th row of the file
             igrf_df = pd.read_csv(igrf_file_path, skiprows=3)
         except FileNotFoundError:
             magnetopy_logging.error(f'Error: File not found at path: "{igrf_file_path}"')
@@ -132,3 +132,34 @@ class MagnetoPyFilesHelper:
             return None
         
         return igrf_df
+    
+    @staticmethod
+    def most_recent_file(folder_path):
+        """
+        This function returns the most recent file in the given folder path.
+        
+        :param folder_path: str
+        :return: str
+        """
+        magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyFilesHelper: most_recent_file')
+        pattern = re.compile(r'.*_(\d{4}-\d{2}-\d{2})_(\d{6})\.csv')
+        
+        most_recent = None
+        most_recent_datetime = None
+        
+        for filename in os.listdir(folder_path):
+            match = pattern.match(filename)
+            if match:
+                file_date_str = match.group(1)
+                file_time_str = match.group(2)
+                file_datetime_str = f"{file_date_str} {file_time_str}"
+                file_datetime = datetime.strptime(file_datetime_str, "%Y-%m-%d %H%M%S")
+                
+                if most_recent is None or file_datetime > most_recent_datetime:
+                    most_recent = filename
+                    most_recent_datetime = file_datetime
+        
+        if most_recent is None:
+            raise FileNotFoundError("No matching files found in the specified folder.")
+        
+        return most_recent
