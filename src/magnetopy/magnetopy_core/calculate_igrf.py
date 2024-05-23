@@ -4,6 +4,7 @@ import pandas as pd
 
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_utils.magnetopy_files_helper import MagnetoPyFilesHelper
+from src.magnetopy.magnetopy_utils.magnetopy_conversions_helper import MagnetoPyConversionsHelper
 
 class CalculateIGRF:
     def __init__(self, arguments: Namespace):
@@ -33,5 +34,9 @@ class CalculateIGRF:
 
         # Show columns of the IGRF coefficients
         self.__magnetopy_logging.info(f'IGRF coefficients columns:\n{igrf_df.columns}')
+
+        test_date = '22-05-2024'
+        decimal_date = MagnetoPyConversionsHelper.convert_date_to_decimal_date(test_date)
+        self.__magnetopy_logging.info(f'Decimal date for {test_date}: {decimal_date}')
 
         return None
