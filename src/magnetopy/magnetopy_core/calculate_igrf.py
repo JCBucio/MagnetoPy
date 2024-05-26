@@ -1,10 +1,12 @@
 from argparse import Namespace
 from logging import getLogger
 import pandas as pd
+from scipy import interpolate
 
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_utils.magnetopy_files_helper import MagnetoPyFilesHelper
 from src.magnetopy.magnetopy_utils.magnetopy_conversions_helper import MagnetoPyConversionsHelper
+from src.magnetopy.magnetopy_utils.magnetopy_igrf_helper import MagnetoPyIGRFHelper
 
 class CalculateIGRF:
     def __init__(self, arguments: Namespace):
@@ -27,16 +29,22 @@ class CalculateIGRF:
         _stations_file_path = self.stations_file
         _stations_cols = self.stations_cols.split(',')
 
-        igrf_df = MagnetoPyFilesHelper.load_igrf_coefficients()
+        igrf = MagnetoPyIGRFHelper().load_igrf_coefficients()
 
-        # Show the first 5 rows of the IGRF coefficients
-        self.__magnetopy_logging.info(f'First 5 rows of the IGRF coefficients:\n{igrf_df.head()}')
+        f = interpolate.interp1d(igrf.time, igrf.coeffs, fill_value='extrapolate')
 
-        # Show columns of the IGRF coefficients
-        self.__magnetopy_logging.info(f'IGRF coefficients columns:\n{igrf_df.columns}')
+        stations_df = MagnetoPyFilesHelper.read_and_verify_columns(_stations_file_path, _stations_cols)
 
-        test_date = '22-05-2024'
-        decimal_date = MagnetoPyConversionsHelper.convert_date_to_decimal_date(test_date)
-        self.__magnetopy_logging.info(f'Decimal date for {test_date}: {decimal_date}')
+        stations_df[_stations_cols[0]] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyFilesHelper.validate_date(x))
+        stations_df[_stations_cols[1]] = stations_df[_stations_cols[1]].apply(lambda x: MagnetoPyFilesHelper.validate_time(x))
+        stations_df['datetime'] = pd.to_datetime(stations_df[_stations_cols[0]] + ' ' + stations_df[_stations_cols[1]])
+
+        stations_df['decimal_date'] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyConversionsHelper.convert_date_to_decimal_date(x))
+
+        self.__magnetopy_logging.info('Stations columns:')
+        self.__magnetopy_logging.info(stations_df.columns)
+
+        self.__magnetopy_logging.info('Stations dataframe:')
+        self.__magnetopy_logging.info(stations_df.head())
 
         return None
