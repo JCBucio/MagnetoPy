@@ -45,6 +45,30 @@ class MagnetoPyFilesHelper:
         raise ValueError("Invalid time format: {}".format(time_str))
     
     @staticmethod
+    def check_lat_bounds(lat):
+        """
+        This function checks the latitude bounds and returns the latitude object.
+
+        :param lat: float
+        :return: float
+        """
+        if -90 <= lat <= 90:
+            return lat
+        raise ValueError("Latitude out of bounds: {}".format(lat))
+    
+    @staticmethod
+    def check_lon_bounds(lon):
+        """
+        This function checks the longitude bounds and returns the longitude object.
+
+        :param lon: float
+        :return: float
+        """
+        if -180 <= lon <= 180:
+            return lon
+        raise ValueError("Longitude out of bounds: {}".format(lon))
+    
+    @staticmethod
     def read_and_verify_columns(file_path, columns):
         """
         This function reads the file from the given path and verifies the columns in the dataset.
@@ -110,29 +134,6 @@ class MagnetoPyFilesHelper:
 
         result_df.to_csv(full_path)
 
-    @staticmethod
-    def load_igrf_coefficients() -> pd.DataFrame:
-        """
-        Load the IGRF coefficients from the resources/igrf13/igrf13coeffs.csv file.
-
-        :return: pd.DataFrame
-        """
-        magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyFilesHelper: load_igrf_coefficients')
-        resources_full_path = os.path.abspath('resources')
-        igrf_folder_path = os.path.join(resources_full_path, 'igrf13')
-        magnetopy_logging.info(f'Loading IGRF coefficients from path: {igrf_folder_path}')
-        igrf_file_path = os.path.join(igrf_folder_path, 'igrf13coeffs.csv')
-        try:
-            igrf_df = pd.read_csv(igrf_file_path, skiprows=3)
-        except FileNotFoundError:
-            magnetopy_logging.error(f'Error: File not found at path: "{igrf_file_path}"')
-            return None
-        except Exception as e:
-            magnetopy_logging.error(f'Error: "{e}"')
-            return None
-        
-        return igrf_df
-    
     @staticmethod
     def most_recent_file(folder_path):
         """
