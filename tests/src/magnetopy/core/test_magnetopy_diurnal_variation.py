@@ -19,7 +19,6 @@ class TestDiurnalVariation(unittest.TestCase):
         """
         magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='TestDiurnalVariation')
 
-        # Create the arguments for the DiurnalVariation class
         arguments = Namespace(
             project_name='cerritos',
             stations_file=os.path.abspath('resources/data_examples/cerritos_datos_estaciones.csv'),
@@ -28,12 +27,8 @@ class TestDiurnalVariation(unittest.TestCase):
             base_station_cols='date,time,nT'
         )
 
-        # Run the DiurnalVariation class
         DiurnalVariation(arguments=arguments)
 
-        # Validate that the last output file generated in the folder resources/cerritos 
-        # is equal to the cerritos_output.csv file in the resources/data_examples folder.
-        # If the files are equal, the test will pass.
         output_folder = os.path.abspath('resources/cerritos')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
         output_file_path = os.path.join(output_folder, output_file)
@@ -43,6 +38,11 @@ class TestDiurnalVariation(unittest.TestCase):
         expected_output_df = pd.read_csv(expected_output_file)
 
         self.assertTrue(output_df.equals(expected_output_df))
+
+        os.remove(output_file_path)
+
+        magnetopy_logging.info(f'File "{output_file_path}" deleted successfully.')
+        magnetopy_logging.info('TestDiurnalVariation: test_diurnal_variation passed successfully.')
 
 if __name__ == '__main__':
     unittest.main()
