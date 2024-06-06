@@ -92,6 +92,12 @@ class MagnetopyParser:
             help='Stations file columns names separated by commas (required).',
             required=True
         )
+        calculate_igrf.add_argument(
+            '--altitude',
+            type=float,
+            help='Altitude in km (required).',
+            required=True
+        )
 
     def get_arguments(self) -> argparse.Namespace:
         """
