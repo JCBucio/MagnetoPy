@@ -14,6 +14,7 @@ class CalculateIGRF:
 
         self.stations_file: str = arguments.stations_file
         self.stations_cols: str = arguments.stations_cols
+        self.altitude: float = arguments.altitude
         
         self.__calculate_igrf()
 
@@ -28,10 +29,12 @@ class CalculateIGRF:
 
         _stations_file_path = self.stations_file
         _stations_cols = self.stations_cols.split(',')
+        _altitude = self.altitude
 
-        igrf = MagnetoPyIGRFHelper().load_igrf_coefficients()
+        # Create an instance of the MagnetoPyIGRFHelper class
+        magnetopyIGRFHelper = MagnetoPyIGRFHelper()
 
-        f = interpolate.interp1d(igrf.time, igrf.coeffs, fill_value='extrapolate')
+        igrf = magnetopyIGRFHelper.load_igrf_coefficients()
 
         stations_df = MagnetoPyFilesHelper.read_and_verify_columns(_stations_file_path, _stations_cols)
 
@@ -41,10 +44,46 @@ class CalculateIGRF:
 
         stations_df['decimal_date'] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyConversionsHelper.convert_date_to_decimal_date(x))
 
-        self.__magnetopy_logging.info('Stations columns:')
-        self.__magnetopy_logging.info(stations_df.columns)
+        # Get the unique dates in the stations_df dataframe
+        unique_dates = stations_df['decimal_date'].unique()
 
-        self.__magnetopy_logging.info('Stations dataframe:')
-        self.__magnetopy_logging.info(stations_df.head())
+        # Convert the unique dates to a numpy array
+        unique_dates = unique_dates.astype(float)
+
+        lat_avg = stations_df[_stations_cols[2]].mean()
+        lon_avg = stations_df[_stations_cols[3]].mean()
+
+        colat = 90 - lat_avg
+
+        alt, colat, sd, cd = magnetopyIGRFHelper.gg_to_geo(_altitude, colat)
+
+        f = interpolate.interp1d(igrf.time, igrf.coeffs, fill_value='extrapolate')
+        coeffs = f(unique_dates)
+
+        B_radius, B_theta, B_phi = magnetopyIGRFHelper.synth_values(coeffs.T, alt, colat, lon_avg, igrf.parameters['nmax'])
+
+        for date in unique_dates:
+            epoch = (date - 1900) // 5
+            epoch_start = epoch * 5
+
+            coeffs_sv = f(1900 + epoch_start + 1) - f(1900 + epoch_start)
+            Brs, Bts, Bps = magnetopyIGRFHelper.synth_values(coeffs_sv.T, alt, colat, lon_avg, igrf.parameters['nmax'])
+
+            coeffsm = f(1900 + epoch_start)
+            Brm, Btm, Bpm = magnetopyIGRFHelper.synth_values(coeffsm.T, alt, colat, lon_avg, igrf.parameters['nmax'])
+
+            X = -B_theta
+            Y = B_phi
+            Z = -B_radius
+
+            dX = -Bts
+            dY = Bps
+            dZ = -Brs
+
+            Xm = -Btm
+            Ym = Bpm
+            Zm = -Brm
+
+            # Rotate back to geodetic coordinates if necessary
 
         return None
