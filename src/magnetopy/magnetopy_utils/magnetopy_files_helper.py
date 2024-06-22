@@ -164,3 +164,18 @@ class MagnetoPyFilesHelper:
             raise FileNotFoundError("No matching files found in the specified folder.")
         
         return most_recent
+    
+    @staticmethod
+    def write_igrf_components_to_dataframe(stations_df, igrf_components):
+        """
+        This function writes the IGRF components to the stations dataframe.
+
+        :param stations_df: pd.DataFrame
+        :param igrf_components: dict
+
+        :return: pd.DataFrame
+        """
+        for col_name, value in igrf_components.items():
+            stations_df[col_name] = value
+
+        return stations_df

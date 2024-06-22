@@ -98,6 +98,12 @@ class MagnetopyParser:
             help='Altitude in km (required).',
             required=True
         )
+        calculate_igrf.add_argument(
+            '--date',
+            type=str,
+            help='Date in format YYYY-MM-DD (required).',
+            required=True
+        )
 
     def get_arguments(self) -> argparse.Namespace:
         """

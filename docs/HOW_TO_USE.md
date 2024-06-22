@@ -39,13 +39,16 @@ ___
     --base_stations_cols <value>    Base station columns names in the following order: date, time and magnetic_field (required).
 
 ___
-### calculate-igrf (in development)
+### calculate-igrf
     Command: calculate-igrf [options]
 
     MagnetoPy command that calculate the total magnetic field intensity from the IGRF coefficients using field data and base stations.
 
+    --project_name <value>          Project name (required).
     --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).
     --stations_cols <value>         Stations file columns names in the following order: date, time, magfield, latitude and longitude (required).
+    --altitude <value>              Altitude of the study area in kilometers (required).
+    --date <value>                  Date of the study in the format YYYY-MM-DD (required).
     
 ___
 ### reduction-to-pole (in development)
