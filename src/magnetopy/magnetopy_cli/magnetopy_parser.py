@@ -105,6 +105,30 @@ class MagnetopyParser:
             required=True
         )
 
+    def __add_plot_profile_arguments(self) -> None:
+        """
+        Add the plot-profile command and parameters.
+
+        :return: Nothing to return
+        :rtype: None
+        """
+        plot_profile = self.__subparsers.add_parser(
+            'plot-profile',
+            help='Command that reads the project file and plots the profile of the selected column.'
+        )
+        plot_profile.add_argument(
+            '--project_file',
+            type=str,
+            help='Project file path (required).',
+            required=True
+        )
+        plot_profile.add_argument(
+            '--col_to_plot',
+            type=str,
+            help='Column to plot (required).',
+            required=True
+        )
+
     def get_arguments(self) -> argparse.Namespace:
         """
         Gets and returns MagnetoPy commands and parameters.
@@ -114,6 +138,7 @@ class MagnetopyParser:
         """
         self.__add_diurnal_variation_arguments()
         self.__add_calculate_igrf_arguments()
+        self.__add_plot_profile_arguments()
 
         arguments = self.__magnetopy_parser.parse_args()
 

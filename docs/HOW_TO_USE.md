@@ -24,7 +24,7 @@ python magnetopy.py <command> --help
 
 ---
 ## Available commands in magnetopy-cli
-    Commands: diurnal-variation, calculate-igrf, reduction-to-pole.
+    Commands: diurnal-variation, calculate-igrf, reduction-to-pole, plot-profile.
 
 ___
 ### diurnal-variation
@@ -55,6 +55,15 @@ ___
     Command: reduction-to-pole [options]
 
     MagnetoPy command that compute the reduction to the pole of magnetic data using frequency domain calculations through Fast Fourier Transform.
+
+___
+### plot-profile
+    Command: plot-profile [options]
+
+    MagnetoPy command that plot the profile of a selected column in the data.
+
+    --project_file <value>          Project file to be read (required).
+    --col_to_plot <value>           Column to plot (required).
 
 ___
 ### Further information

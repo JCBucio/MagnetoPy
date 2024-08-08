@@ -32,3 +32,20 @@ Documentation:
 | diurnal-variation	         | Diurnal variation calculation               | Available                                   |
 | calculate-igrf	         | IGRF Coefficients calculation               | **Available**                              |
 | reduction-to-pole          | Reduction to Pole calculation               | In development                              |
+
+## MagnetoPy ```1.2.0``` (August 7th, 2024)
+
+New features:
+
+- Added `plot-profile` command to plot the profile of a selected column in the data.
+
+Documentation:
+
+- Added documentation for the `plot-profile` command in the HOW_TO_USE.md file.
+
+| **Command**                | **Calculation**                             |**Status**                                   |
+|----------------------------|---------------------------------------------|---------------------------------------------|
+| diurnal-variation	         | Diurnal variation calculation               | Available                                   |
+| calculate-igrf	         | IGRF Coefficients calculation               | Available                                   |
+| reduction-to-pole          | Reduction to Pole calculation               | In development                              |
+| plot-profile               | Plot profile of a selected column           | **Available**                              |

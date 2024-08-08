@@ -4,6 +4,7 @@ from argparse import Namespace
 
 from src.magnetopy.magnetopy_core.diurnal_variation import DiurnalVariation
 from src.magnetopy.magnetopy_core.calculate_igrf import CalculateIGRF
+from src.magnetopy.magnetopy_core.plot_profile import PlotProfile
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_cli.magnetopy_parser import MagnetopyParser
 
@@ -34,6 +35,9 @@ class Magnetopy:
         elif self.command == 'calculate-igrf':
             self.magnetopy_logging.info("calculate-igrf command selected")
             CalculateIGRF(arguments=self.__arguments)
+        elif self.command == 'plot-profile':
+            self.magnetopy_logging.info("plot-profile command selected")
+            PlotProfile(arguments=self.__arguments)
 
     def __print_banner(self) -> None:
         """

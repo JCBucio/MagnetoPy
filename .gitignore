@@ -9,8 +9,9 @@ resources/*
 !resources/data_examples
 !resources/igrf13
 
-# Ignore the .idea folder
+# Ignore the .idea and .run folder
 .idea/
+.run/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
