@@ -27,6 +27,7 @@ class CalculateIGRF:
         :return: Nothing to return
         :rtype: None
         """
+        # TODO: Update runConfigurations
         self.__magnetopy_logging.info('Performing the IGRF correction')
 
         _project_name = self.project_name

@@ -40,7 +40,7 @@ class PlotProfile:
         plt.ylabel(_col_to_plot)
         plt.title(f'Profile of the column: {_col_to_plot}')
         plt.grid(alpha=0.5)
-
+        # TODO: Save the plot in the project resources folder
         plt.show(block=True)
 
         self.__magnetopy_logging.info('Profile plotted successfully')

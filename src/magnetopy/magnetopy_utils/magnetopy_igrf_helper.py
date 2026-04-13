@@ -29,6 +29,7 @@ class MagnetoPyIGRFHelper:
 
         :return: IGRF object
         """
+        # TODO: Update to IGRF-14
         magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyIGRFHelper: load_igrf_coefficients')
         magnetopy_logging.info('Loading the IGRF coefficients')
         resources_path = os.path.abspath('resources')
