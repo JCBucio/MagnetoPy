@@ -38,7 +38,7 @@ git clone https://github.com/JCBucio/MagnetoPy.git
 3. Select the MagnetoPy folder where you cloned the repository.
 4. Copy the `runConfigurations` folder from the repository to the `.idea` folder in the project.
 
-> **Note**: If the `.idea` folder does not appear in the project files, you can try closing the project and opening it again.
+> **Note**: If the `.idea` folder does not appear in the project files, you can try closing the project and opening it again. It also usually appears when you click on the "Project Files" menu in the upper left, just above the project files.
 
 ---
 
