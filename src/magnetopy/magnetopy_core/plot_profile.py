@@ -28,6 +28,10 @@ class PlotProfile:
         _project_file_path = self.project_file
         _col_to_plot = self.col_to_plot
 
+        output_path = _project_file_path.split('/')
+        output_path.pop(-1)
+        output_path = '/'.join(output_path)
+
         project_df = MagnetoPyFilesHelper.read_and_verify_columns(_project_file_path, [_col_to_plot])
 
         if project_df is None:
@@ -36,11 +40,13 @@ class PlotProfile:
         
         plt.plot(project_df[_col_to_plot])
 
-        plt.xlabel('Index')
+        plt.xlabel('Values')
         plt.ylabel(_col_to_plot)
         plt.title(f'Profile of the column: {_col_to_plot}')
         plt.grid(alpha=0.5)
-        # TODO: Save the plot in the project resources folder
+        plt.savefig(f'{output_path}/{_col_to_plot}.png', dpi=300)
         plt.show(block=True)
+
+        self.__magnetopy_logging.info(f'Profile plot saved in {output_path}/{_col_to_plot}.png')
 
         self.__magnetopy_logging.info('Profile plotted successfully')
