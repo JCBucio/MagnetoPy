@@ -6,7 +6,7 @@ MagnetoPy is an open-source Command Line Interface (CLI) written in Python, desi
 
 - **Diurnal variation correction**: MagnetoPy command that calculate the diurnal variation using field and base station data.
 
-- **IGRF correction**: MagnetoPy command that calculate the total magnetic field intensity from the IGRF coefficients using field data and base stations.
+- **IGRF-14 correction**: MagnetoPy command that calculate the total magnetic field intensity from the IGRF-14 coefficients using field data and base stations.
 
 - **Reduction to the Pole (RTP)**: MagnetoPy command that compute the reduction to the pole of magnetic data using frequency domain calculations through Fast Fourier Transform.
 

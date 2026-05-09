@@ -25,22 +25,20 @@ class IGRF:
 class MagnetoPyIGRFHelper:
     def load_igrf_coefficients(self):
         """
-        This function loads the shc-file with the IGRF-13 coefficients and return a IGRF object.
+        This function loads the shc-file with the IGRF-14 coefficients and return a IGRF object.
 
         :return: IGRF object
         """
-        # TODO: Update to IGRF-14
         magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPyIGRFHelper: load_igrf_coefficients')
         magnetopy_logging.info('Loading the IGRF coefficients')
         resources_path = os.path.abspath('resources')
-        igrf13_full_path = os.path.join(resources_path, 'igrf13')
-        igrf13_file = os.path.join(igrf13_full_path, 'IGRF13.shc')
+        igrf14_full_path = os.path.join(resources_path, 'igrf14')
+        igrf14_file = os.path.join(igrf14_full_path, 'IGRF14.shc')
 
-        if not os.path.exists(igrf13_file):
-            raise FileNotFoundError(f"IGRF coefficients file not found: {igrf13_file}")
+        if not os.path.exists(igrf14_file):
+            raise FileNotFoundError(f"IGRF coefficients file not found: {igrf14_file}")
 
-        with open(igrf13_file, 'r') as f:
-
+        with open(igrf14_file, 'r') as f:
             data = np.array([])
             for line in f.readlines():
                 if line.startswith('#'):
@@ -48,7 +46,7 @@ class MagnetoPyIGRFHelper:
 
                 read_line = np.fromstring(line, sep=' ')
                 if read_line.size == 7:
-                    name = os.path.split(igrf13_file)[1]
+                    name = os.path.split(igrf14_file)[1]
                     values = [name] + read_line.astype(int).tolist()
                 else:
                     data = np.append(data, read_line)
@@ -60,7 +58,7 @@ class MagnetoPyIGRFHelper:
         coeffs = data[parameters['N']:].reshape((-1, parameters['N']+2))
         coeffs = np.squeeze(coeffs[:, 2:])
 
-        magnetopy_logging.info(f'IGRF coefficients from file: {igrf13_file} loaded successfully.')
+        magnetopy_logging.info(f'IGRF coefficients from file: {igrf14_file} loaded successfully.')
 
         return IGRF(time, coeffs, parameters)
 

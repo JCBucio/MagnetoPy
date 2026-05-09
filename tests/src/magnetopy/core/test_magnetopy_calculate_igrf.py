@@ -19,8 +19,6 @@ class TestCalculateIGRF(unittest.TestCase):
         """
         magnetopy_logging = MagnetopyLogging().create_magnetopy_logging(logger='TestCalculateIGRF')
 
-        print("----------------------------------------------------------------------")
-
         arguments = Namespace(
             project_name='cerritos_test',
             stations_file=os.path.abspath('resources/data_examples/cerritos_datos_estaciones.csv'),
@@ -49,5 +47,3 @@ class TestCalculateIGRF(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-

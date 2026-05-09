@@ -72,7 +72,7 @@ class MagnetopyParser:
         """
         calculate_igrf = self.__subparsers.add_parser(
             'calculate-igrf',
-            help='Command that performs the IGRF correction to a data set based on the 13th generation coefficients.'
+            help='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.'
         )
         calculate_igrf.add_argument(
             '--project_name',
@@ -89,7 +89,7 @@ class MagnetopyParser:
         calculate_igrf.add_argument(
             '--stations_cols',
             type=str,
-            help='Stations file columns names separated by commas (required).',
+            help='Stations file columns names in the following order: date, time, magfield, latitude and longitude (required).',
             required=True
         )
         calculate_igrf.add_argument(

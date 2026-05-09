@@ -30,7 +30,7 @@ Documentation:
 | **Command**                | **Calculation**                             |**Status**                                   |
 |----------------------------|---------------------------------------------|---------------------------------------------|
 | diurnal-variation	         | Diurnal variation calculation               | Available                                   |
-| calculate-igrf	         | IGRF Coefficients calculation               | **Available**                              |
+| calculate-igrf	         | IGRF Coefficients calculation               | **Available**                               |
 | reduction-to-pole          | Reduction to Pole calculation               | In development                              |
 
 ## MagnetoPy ```1.2.0``` (August 7th, 2024)
@@ -48,4 +48,22 @@ Documentation:
 | diurnal-variation	         | Diurnal variation calculation               | Available                                   |
 | calculate-igrf	         | IGRF Coefficients calculation               | Available                                   |
 | reduction-to-pole          | Reduction to Pole calculation               | In development                              |
-| plot-profile               | Plot profile of a selected column           | **Available**                              |
+| plot-profile               | Plot profile of a selected column           | **Available**                               |
+
+## MagnetoPy ```1.2.1``` (May 8th, 2026)
+
+New features:
+
+- Added unit tests for the `calculate-igrf` command.
+- Updated IGRF coefficients to the latest version (IGRF-14).
+
+Documentation:
+
+- Updated documentation for the `calculate-igrf` command.
+
+| **Command**                | **Calculation**                             |**Status**                                   |
+|----------------------------|---------------------------------------------|---------------------------------------------|
+| diurnal-variation	         | Diurnal variation calculation               | Available                                   |
+| calculate-igrf	         | IGRF Coefficients calculation               | Available                                   |
+| reduction-to-pole          | Reduction to Pole calculation               | In development                              |
+| plot-profile               | Plot profile of a selected column           | Available                                   |

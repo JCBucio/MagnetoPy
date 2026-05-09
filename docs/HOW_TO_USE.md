@@ -24,7 +24,7 @@ python magnetopy.py <command> --help
 
 ---
 ## Available commands in magnetopy-cli
-    Commands: diurnal-variation, calculate-igrf, reduction-to-pole, plot-profile.
+    Commands: diurnal-variation, calculate-igrf, reduction-to-pole (in development), plot-profile.
 
 ___
 ### diurnal-variation
@@ -42,7 +42,7 @@ ___
 ### calculate-igrf
     Command: calculate-igrf [options]
 
-    MagnetoPy command that calculate the total magnetic field intensity from the IGRF coefficients using field data and base stations.
+    MagnetoPy command that calculate the total magnetic field intensity from the IGRF-14 coefficients using field data and base stations.
 
     --project_name <value>          Project name (required).
     --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).

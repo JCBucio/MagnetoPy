@@ -22,7 +22,7 @@ class CalculateIGRF:
 
     def __calculate_igrf(self) -> None:
         """
-        Performs the IGRF correction to a data set based on the 13th generation coefficients.
+        Performs the IGRF correction to a data set based on the 14th generation coefficients.
 
         :return: Nothing to return
         :rtype: None
