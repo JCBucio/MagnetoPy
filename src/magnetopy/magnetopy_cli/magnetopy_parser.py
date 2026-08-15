@@ -30,7 +30,8 @@ class MagnetopyParser:
         """
         diurnal_variation = self.__subparsers.add_parser(
             'diurnal-variation',
-            help='MagnetoPy command that calculates the diurnal variation in a dataset.'
+            help='MagnetoPy command that calculates the diurnal variation in a dataset.',
+            description='MagnetoPy command that calculates the diurnal variation in a dataset. It requires a stations file and a base station file to perform the calculations.'
         )
         diurnal_variation.add_argument(
             '--project_name',
@@ -72,7 +73,8 @@ class MagnetopyParser:
         """
         calculate_igrf = self.__subparsers.add_parser(
             'calculate-igrf',
-            help='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.'
+            help='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.',
+            description='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.'
         )
         calculate_igrf.add_argument(
             '--project_name',
@@ -114,7 +116,8 @@ class MagnetopyParser:
         """
         plot_profile = self.__subparsers.add_parser(
             'plot-profile',
-            help='Command that reads the project file and plots the profile of the selected column.'
+            help='Command that reads the project file and plots the profile of the selected column.',
+            description='Command that reads the project file and plots the profile of the selected column.'
         )
         plot_profile.add_argument(
             '--project_file',
