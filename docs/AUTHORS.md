@@ -2,9 +2,9 @@
 
 ---
 ## Author
-* **Juan Carlos Bucio Tejeda**
+* **Juan Carlos Bucio Tejeda (Universidad Nacional Autónoma de México)**
 
 ---
 ## Tutors
-* **Dulce María Gutiérrez Carmona**
-* **Gerardo Cifuentes Nava**
+* **M.Sc. Dulce María Gutiérrez Carmona (Universidad Michoacana de San Nicolás de Hidalgo)**
+* **Dr. Gerardo Cifuentes Nava (Universidad Nacional Autónoma de México)**

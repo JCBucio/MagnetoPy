@@ -67,3 +67,21 @@ Documentation:
 | calculate-igrf	         | IGRF Coefficients calculation               | Available                                   |
 | reduction-to-pole          | Reduction to Pole calculation               | In development                              |
 | plot-profile               | Plot profile of a selected column           | Available                                   |
+
+## MagnetoPy ```1.2.2``` (August 29th, 2026)
+
+New features:
+
+- Added `plot-map` command to visualise geographic locations of magnetic data points from CSV files.
+
+Documentation:
+
+- Added documentation for the `plot-map` command in the HOW_TO_USE.md file.
+
+| **Command**                | **Calculation**                             |**Status**                                   |
+|----------------------------|---------------------------------------------|---------------------------------------------|
+| diurnal-variation	         | Diurnal variation calculation               | Available                                   |
+| calculate-igrf	         | IGRF Coefficients calculation               | Available                                   |
+| reduction-to-pole          | Reduction to Pole calculation               | In development                              |
+| plot-profile               | Plot profile of a selected column           | Available                                   |
+| plot-map                  | Plot geographic locations of data points    | **Available**                               |

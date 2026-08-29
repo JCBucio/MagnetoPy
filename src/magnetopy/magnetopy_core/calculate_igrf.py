@@ -28,6 +28,7 @@ class CalculateIGRF:
         :rtype: None
         """
         # TODO: Update runConfigurations
+        # TODO: Add a verbose option to include all columns obtained from the IGRF
         self.__magnetopy_logging.info('Performing the IGRF correction')
 
         _project_name = self.project_name

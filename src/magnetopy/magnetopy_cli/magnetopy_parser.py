@@ -132,6 +132,37 @@ class MagnetopyParser:
             required=True
         )
 
+    def __add_plot_map_arguments(self) -> None:
+        """
+        Add the plot-map command and parameters.
+
+        :return: Nothing to return
+        :rtype: None
+        """
+        plot_map = self.__subparsers.add_parser(
+            'plot-map',
+            help='Command that reads the data file and plots the points on a geographic map.',
+            description='Command that reads the data file and plots the points on a geographic map.'
+        )
+        plot_map.add_argument(
+            '--project_file',
+            type=str,
+            help='Project CSV file path (required).',
+            required=True
+        )
+        plot_map.add_argument(
+            '--latitude_col',
+            type=str,
+            help='Latitude column name in the CSV file (required).',
+            required=True
+        )
+        plot_map.add_argument(
+            '--longitude_col',
+            type=str,
+            help='Longitude column name in the CSV file (required).',
+            required=True
+        )
+
     def get_arguments(self) -> argparse.Namespace:
         """
         Gets and returns MagnetoPy commands and parameters.
@@ -142,6 +173,7 @@ class MagnetopyParser:
         self.__add_diurnal_variation_arguments()
         self.__add_calculate_igrf_arguments()
         self.__add_plot_profile_arguments()
+        self.__add_plot_map_arguments()
 
         arguments = self.__magnetopy_parser.parse_args()
 

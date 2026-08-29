@@ -5,6 +5,7 @@ from argparse import Namespace
 from src.magnetopy.magnetopy_core.diurnal_variation import DiurnalVariation
 from src.magnetopy.magnetopy_core.calculate_igrf import CalculateIGRF
 from src.magnetopy.magnetopy_core.plot_profile import PlotProfile
+from src.magnetopy.magnetopy_core.plot_map import PlotMap
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_cli.magnetopy_parser import MagnetopyParser
 
@@ -38,6 +39,9 @@ class Magnetopy:
         elif self.command == 'plot-profile':
             self.magnetopy_logging.info("plot-profile command selected")
             PlotProfile(arguments=self.__arguments)
+        elif self.command == 'plot-map':
+            self.magnetopy_logging.info("plot-map command selected")
+            PlotMap(arguments=self.__arguments)
 
     def __print_banner(self) -> None:
         """
@@ -50,10 +54,21 @@ class Magnetopy:
         for argument_name, argument_value in vars(self.__arguments).items():
             arguments_str += f'{argument_name}: {argument_value}\n'
 
+        # Add my tutors to the banner
+        # ---
+        ## Tutors
+        # Dulce María Gutiérrez Carmona
+        # Gerardo Cifuentes Nava
+
         banner = f'''
 ######################## MAGNETOPY ########################
 ##                                                       ##  
 ##  Written by Juan Carlos Bucio (jcbucio.geo@gmail.com) ##
+##     Universidad Nacional Autónoma de México (UNAM)    ##
+##                                                       ##
+##   Supervised by M.Sc. Dulce María Gutiérrez Carmona   ##
+##            and Dr. Gerardo Cifuentes Nava             ##
+##                                                       ##
 ##               Licensed under MIT license              ##
 ##                                                       ##
 ###########################################################
