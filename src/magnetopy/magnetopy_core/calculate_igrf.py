@@ -17,8 +17,41 @@ class CalculateIGRF:
         self.stations_cols: str = arguments.stations_cols
         self.altitude: float = arguments.altitude
         self.date: str = arguments.date
+        self.verbose: bool = getattr(arguments, 'verbose', False)
         
         self.__calculate_igrf()
+
+    def __build_results(self, dec, hoz, inc, eff, X, Y, Z, decs, hozs, incs, effs, dX, dY, dZ):
+        """
+        Build the output IGRF result dictionary.
+
+        Default mode includes the principal field components only.
+        Verbose mode additionally includes the secular variation columns.
+        """
+        degree_sign = u'\N{DEGREE SIGN}'
+        results = {
+            'igrf_date': self.date,
+            f'D({degree_sign})': dec,
+            f'I({degree_sign})': inc,
+            'H(nT)': hoz,
+            'F(nT)': eff,
+            'X(nT)': X,
+            'Y(nT)': Y,
+            'Z(nT)': Z,
+        }
+
+        if self.verbose:
+            results.update({
+                'SV_D(min/yr)': decs,
+                'SV_I(min/yr)': incs,
+                'SV_H(nT/yr)': hozs,
+                'SV_F(nT/yr)': effs,
+                'SV_X(nT/yr)': dX,
+                'SV_Y(nT/yr)': dY,
+                'SV_Z(nT/yr)': dZ,
+            })
+
+        return results
 
     def __calculate_igrf(self) -> None:
         """
@@ -27,8 +60,6 @@ class CalculateIGRF:
         :return: Nothing to return
         :rtype: None
         """
-        # TODO: Update runConfigurations
-        # TODO: Add a verbose option to include all columns obtained from the IGRF
         self.__magnetopy_logging.info('Performing the IGRF correction')
 
         _project_name = self.project_name
@@ -37,7 +68,6 @@ class CalculateIGRF:
         _altitude = self.altitude
         _date = self.date
 
-        # Create an instance of the MagnetoPyIGRFHelper class
         magnetopyIGRFHelper = MagnetoPyIGRFHelper()
 
         igrf = magnetopyIGRFHelper.load_igrf_coefficients()
@@ -49,12 +79,6 @@ class CalculateIGRF:
         stations_df['datetime'] = pd.to_datetime(stations_df[_stations_cols[0]] + ' ' + stations_df[_stations_cols[1]])
 
         stations_df['decimal_date'] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyConversionsHelper.convert_date_to_decimal_date(x))
-
-        # Get the unique dates in the stations_df dataframe
-        #unique_dates = stations_df['decimal_date'].unique()
-
-        # Convert the unique dates to a numpy array
-        #unique_dates = unique_dates.astype(float)
 
         date = MagnetoPyConversionsHelper.convert_date_to_decimal_date(_date)
 
@@ -112,25 +136,22 @@ class CalculateIGRF:
         # at the start of each five year epoch e. g. 2010, 2015, 2020.
         decs, hozs, incs, effs = magnetopyIGRFHelper.xyz2dhif_sv(Xm, Ym, Zm, dX, dY, dZ)
 
-        # Convert the results to a dictionary as above
-        degree_sign= u'\N{DEGREE SIGN}'
-        results = {
-            'igrf_date': date,
-            f'D({degree_sign})': dec,
-            f'I({degree_sign})': inc,
-            'H(nT)': hoz,
-            'F(nT)': eff,
-            'X(nT)': X,
-            'Y(nT)': Y,
-            'Z(nT)': Z,
-            'SV_D(min/yr)': decs,
-            'SV_I(min/yr)': incs,
-            'SV_H(nT/yr)': hozs,
-            'SV_F(nT/yr)': effs,
-            'SV_X(nT/yr)': dX,
-            'SV_Y(nT/yr)': dY,
-            'SV_Z(nT/yr)': dZ
-        }
+        results = self.__build_results(
+            dec=dec,
+            hoz=hoz,
+            inc=inc,
+            eff=eff,
+            X=X,
+            Y=Y,
+            Z=Z,
+            decs=decs,
+            hozs=hozs,
+            incs=incs,
+            effs=effs,
+            dX=dX,
+            dY=dY,
+            dZ=dZ,
+        )
 
         output_df = MagnetoPyFilesHelper.write_igrf_components_to_dataframe(stations_df, results)
 

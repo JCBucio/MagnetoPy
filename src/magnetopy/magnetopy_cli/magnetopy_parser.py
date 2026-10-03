@@ -91,7 +91,7 @@ class MagnetopyParser:
         calculate_igrf.add_argument(
             '--stations_cols',
             type=str,
-            help='Stations file columns names in the following order: date, time, magfield, latitude and longitude (required).',
+            help='Stations file columns in the following order: date, time, magfield, latitude and longitude (required).',
             required=True
         )
         calculate_igrf.add_argument(
@@ -105,6 +105,11 @@ class MagnetopyParser:
             type=str,
             help='Date in format YYYY-MM-DD (required).',
             required=True
+        )
+        calculate_igrf.add_argument(
+            '--verbose',
+            action='store_true',
+            help='Include the secular variation columns in the output CSV. By default only the main IGRF components are included.'
         )
 
     def __add_plot_profile_arguments(self) -> None:
