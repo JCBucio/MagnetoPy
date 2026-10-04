@@ -1,0 +1,6 @@
+project_name: cerritos_test
+stations_file: resources/data_examples/cerritos_datos_estaciones.csv
+stations_cols: date,time,gpslat,gpslon,magfield
+altitude: 1.92
+date: 2019-03-26
+verbose: false

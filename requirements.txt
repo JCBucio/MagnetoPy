@@ -4,3 +4,5 @@ pandas>=2.2.3,<3
 scipy>=1.13,<2
 pytest>=7.4,<8
 cartopy>=0.24,<0.25
+verde>=1.8.1,<2
+harmonica>=0.7,<1

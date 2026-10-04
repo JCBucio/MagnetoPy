@@ -8,63 +8,61 @@ MagnetoPy is an open-source Command Line Interface (CLI) written in Python, desi
 
 - **IGRF-14 correction**: MagnetoPy command that calculate the total magnetic field intensity from the IGRF-14 coefficients using field data and base stations.
 
+- **Profile plotting**: MagnetoPy command that reads a project CSV and plots the temporal or spatial profile of a selected column.
+
+- **Map plotting**: MagnetoPy command that displays geographic locations from a dataset as a map for quick spatial inspection.
+
 - **Reduction to the Pole (RTP)**: MagnetoPy command that compute the reduction to the pole of magnetic data using frequency domain calculations through Fast Fourier Transform.
 
 ## Installation
 
-Check the ENVIROMENT_MANUAL.md file in the `docs` folder to prepare your environment.
+Check the `docs/ENVIRONMENT_MANUAL.md` file to prepare your environment using Conda.
 
 ## Usage
 
-Check the HOW_TO_USE.md file in the `docs` folder to learn how to use the CLI.
+Check the `docs/HOW_TO_USE.md` file to learn how to use the CLI and the config-file workflow.
 
 ## Quick start
 
-1. Create and activate a Python virtual environment (recommended):
+1. Create and activate a Conda environment:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+conda create -n magnetopy_env python=3.11 -y
+conda activate magnetopy_env
 ```
 
 2. Install project dependencies:
 
 ```bash
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-3. Run example commands (adjust paths/column names as needed):
+3. Run the tool using config files (preferred workflow):
 
 ```bash
 # Diurnal variation
-python magnetopy.py diurnal-variation \
-	--project_name cerritos_test \
-	--stations_file resources/data_examples/cerritos_datos_estaciones.csv \
-	--stations_cols date,time,latitude,longitude,magfield \
-	--base_station_file resources/data_examples/cerritos_estaciones_base.csv \
-	--base_station_cols date,time,magfield
+python magnetopy.py diurnal-variation --config resources/config_templates/diurnal_variation_config.yaml
 
 # Calculate IGRF
-python magnetopy.py calculate-igrf \
-	--project_name cerritos_test \
-	--stations_file resources/data_examples/cerritos_datos_estaciones.csv \
-	--stations_cols date,time,magfield,latitude,longitude \
-	--altitude 1.920 \
-	--date 2019-03-26
+python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml
 
 # Plot profile
-python magnetopy.py plot-profile \
-	--project_file resources/cerritos_test/cerritos_test_2026-05-08_223841.csv \
-	--col_to_plot diurnal_var_corr
+python magnetopy.py plot-profile --config resources/config_templates/plot_profile_config.yaml
 
 # Plot map
-python magnetopy.py plot-map \
-	--project_file resources/data_examples/cerritos_datos_estaciones.csv \
-	--latitude_col gpslat \
-	--longitude_col gpslon
+python magnetopy.py plot-map --config resources/config_templates/plot_map_config.yaml
+
+# Reduction to pole
+python magnetopy.py reduction-to-pole --config resources/config_templates/reduction_to_pole_config.yaml
 ```
 
-4. Inspect outputs in the `resources/` folder (CSV results, PNG plots).
+4. You can still override a value from the config file for a single run:
+
+```bash
+python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml --date 2020-01-15
+```
+
+5. Inspect outputs in the `resources/` folder (CSV results, PNG plots).
 
 ## Troubleshooting
 
@@ -80,8 +78,8 @@ python -m pip install -r requirements.txt
 - If you use Conda, prefer installing Cartopy and its binary dependencies from conda-forge:
 
 ```bash
-conda create -n magnetopy python=3.11 -y
-conda activate magnetopy
+conda create -n magnetopy_env python=3.11 -y
+conda activate magnetopy_env
 conda install -c conda-forge cartopy matplotlib pandas scipy numpy -y
 python -m pip install -r requirements.txt --no-deps
 ```

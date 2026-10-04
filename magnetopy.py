@@ -6,6 +6,7 @@ from src.magnetopy.magnetopy_core.diurnal_variation import DiurnalVariation
 from src.magnetopy.magnetopy_core.calculate_igrf import CalculateIGRF
 from src.magnetopy.magnetopy_core.plot_profile import PlotProfile
 from src.magnetopy.magnetopy_core.plot_map import PlotMap
+from src.magnetopy.magnetopy_core.reduction_to_pole import ReductionToPole
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_cli.magnetopy_parser import MagnetopyParser
 
@@ -42,6 +43,9 @@ class Magnetopy:
         elif self.command == 'plot-map':
             self.magnetopy_logging.info("plot-map command selected")
             PlotMap(arguments=self.__arguments)
+        elif self.command == 'reduction-to-pole':
+            self.magnetopy_logging.info("reduction-to-pole command selected")
+            ReductionToPole(arguments=self.__arguments)
 
     def __print_banner(self) -> None:
         """

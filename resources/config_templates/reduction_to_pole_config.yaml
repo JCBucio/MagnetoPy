@@ -1,0 +1,12 @@
+project_name: rtp_irregular
+project_file: resources/data_examples/regular_grid.csv
+easting_col: easting
+northing_col: northing
+magnetic_field_col: magnetic_field
+inclination: 45.0
+declination: -10.0
+magnetization_inclination: 45.0
+magnetization_declination: -10.0
+upward_col: upward
+# Set to true to use the equivalent-sources approximation
+# equivalent_sources: true

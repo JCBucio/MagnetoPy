@@ -24,7 +24,7 @@ python magnetopy.py <command> --help
 
 ---
 ## Available commands in magnetopy-cli
-    Commands: diurnal-variation, calculate-igrf, reduction-to-pole (in development), plot-profile.
+    Commands: diurnal-variation, calculate-igrf, reduction-to-pole, plot-profile, plot-map.
 
 ___
 ### diurnal-variation
@@ -160,6 +160,164 @@ python magnetopy.py plot-map \
 ```
 
         The command saves a PNG map next to the input CSV (e.g. `cerritos_datos_estaciones_map.png`).
+### reduction-to-pole
+    Command: reduction-to-pole [options]
+
+    MagnetoPy command that computes a reduction-to-pole magnetic grid using Harmonica.
+    If the input data are irregular, MagnetoPy automatically interpolates them to a regular grid
+    using a default Verde spline interpolation. If the user enables equivalent sources, the command
+    instead uses Harmonica's EquivalentSources approximation, which is useful for datasets with
+    significant altitude variation such as aeromagnetic surveys.
+
+    --project_name <value>             Project name to store the output CSV (required).
+    --project_file <value>             Input CSV file with geophysical grid data (required).
+    --easting_col <value>              Column name for easting coordinates (required).
+    --northing_col <value>             Column name for northing coordinates (required).
+    --magnetic_field_col <value>        Column name for magnetic field values (required).
+    --inclination <value>             Inclination of the inducing geomagnetic field in degrees (required).
+    --declination <value>             Declination of the inducing geomagnetic field in degrees (required).
+    --magnetization_inclination <value> Optional magnetization inclination in degrees. Defaults to the inducing field inclination.
+    --magnetization_declination <value> Optional magnetization declination in degrees. Defaults to the inducing field declination.
+    --upward_col <value>               Optional column containing altitude/upward coordinate values. Recommended when the survey has strong elevation variation.
+    --equivalent-sources               Use Harmonica EquivalentSources instead of the default Verde spline interpolation.
+
+        Example with default spline interpolation:
+
+```sh
+python magnetopy.py reduction-to-pole \
+    --project_name rtp_example \
+    --project_file resources/data_examples/irregular_grid.csv \
+    --easting_col easting \
+    --northing_col northing \
+    --magnetic_field_col magnetic_field \
+    --inclination 45 \
+    --declination 0
+```
+
+        Example with equivalent-sources approximation:
+
+```sh
+python magnetopy.py reduction-to-pole \
+    --project_name rtp_aeromag \
+    --project_file resources/data_examples/aeromag_grid.csv \
+    --easting_col easting \
+    --northing_col northing \
+    --magnetic_field_col magnetic_field \
+    --upward_col altitude \
+    --inclination 55 \
+    --declination 10 \
+    --equivalent-sources
+```
+
+Output
+
+The command saves a CSV file inside `resources/<project_name>/`. The output includes the reduced-to-pole magnetic field values in a regular grid format with the columns produced by Harmonica.
+
+Notes
+
+- The default path is `Verde.Spline` interpolation, used when the input grid is irregular.
+- The `--equivalent-sources` option is useful for datasets with strong altitude variation, such as aeromagnetic data.
+- If the input file is already on a regular grid, the command uses it directly without interpolation.
+
+___
 ### Further information
 If there are still some doubts about the usage of these commands, you can check this post on my blog with a example of how to use the CLI:
 [MagnetoPy](https://jcbucio.github.io/portafolio/MagnetoPy)
+
+---
+## Using YAML config files
+
+MagnetoPy supports parameter files so you can avoid typing long arguments on the command line. Define your preferred project setup in a JSON, YAML, or INI file and use it with `--config`.
+
+Priority order is:
+
+1. config file values
+2. CLI arguments
+
+Use the config file for the main project configuration and use CLI arguments only when you want to override a specific value for a single run.
+
+This is especially useful for long file paths, repeated parameter sets, and project reproducibility.
+
+### Example config files
+
+The repository includes ready-to-use templates in `resources/config_templates/`:
+
+- `diurnal_variation_config.yaml`
+- `calculate_igrf_config.yaml`
+- `plot_profile_config.yaml`
+- `plot_map_config.yaml`
+- `reduction_to_pole_config.yaml`
+
+Each one can be used like this:
+
+```sh
+python magnetopy.py diurnal-variation --config resources/config_templates/diurnal_variation_config.yaml
+python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml
+python magnetopy.py plot-profile --config resources/config_templates/plot_profile_config.yaml
+python magnetopy.py plot-map --config resources/config_templates/plot_map_config.yaml
+python magnetopy.py reduction-to-pole --config resources/config_templates/reduction_to_pole_config.yaml
+```
+
+### YAML examples
+
+#### diurnal-variation
+
+```yaml
+project_name: cerritos_test
+stations_file: resources/data_examples/cerritos_datos_estaciones.csv
+stations_cols: date,time,latitude,longitude,magnetic_field
+base_station_file: resources/data_examples/cerritos_estaciones_base.csv
+base_station_cols: date,time,magnetic_field
+```
+
+#### calculate-igrf
+
+```yaml
+project_name: cerritos_test
+stations_file: resources/data_examples/cerritos_datos_estaciones.csv
+stations_cols: date,time,gpslat,gpslon,magfield
+altitude: 1.92
+date: 2019-03-26
+verbose: false
+```
+
+#### plot-profile
+
+```yaml
+project_file: resources/cerritos_test/cerritos_test_2026-05-08_223841.csv
+col_to_plot: diurnal_var_corr
+```
+
+#### plot-map
+
+```yaml
+project_file: resources/cerritos_test/cerritos_test_2026-05-08_223841.csv
+latitude_col: latitude
+longitude_col: longitude
+```
+
+#### reduction-to-pole
+
+```yaml
+project_name: rtp_irregular
+project_file: resources/data_examples/regular_grid.csv
+easting_col: easting
+northing_col: northing
+magnetic_field_col: magnetic_field
+inclination: 45.0
+declination: -10.0
+magnetization_inclination: 45.0
+magnetization_declination: -10.0
+upward_col: upward
+# equivalent_sources: true
+```
+
+You can also override a config value on the command line. For example:
+
+```sh
+python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml --date 2020-01-15
+```
+
+This keeps the rest of the configuration file as a reusable base while changing only the arguments you need for a single run.
+
+---
