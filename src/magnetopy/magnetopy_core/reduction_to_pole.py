@@ -16,11 +16,11 @@ class ReductionToPole:
     def __init__(self, arguments: Namespace):
         self.__magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='ReductionToPole')
 
-        self.project_name: str = arguments.project_name
         self.project_file: str = arguments.project_file
-        self.easting_col: str = arguments.easting_col
-        self.northing_col: str = arguments.northing_col
-        self.magnetic_field_col: str = arguments.magnetic_field_col
+        self.project_name: str | None = getattr(arguments, 'project_name', None)
+        self.easting_col: str | None = getattr(arguments, 'easting_col', None)
+        self.northing_col: str | None = getattr(arguments, 'northing_col', None)
+        self.magnetic_field_col: str | None = getattr(arguments, 'magnetic_field_col', None)
         self.upward_col: str | None = getattr(arguments, 'upward_col', None)
         self.equivalent_sources: bool = getattr(arguments, 'equivalent_sources', False)
         self.inclination: float = arguments.inclination
@@ -136,6 +136,28 @@ class ReductionToPole:
         """
         self.__magnetopy_logging.info('Validating the project grid and preparing the RTP input')
 
+        _project_file_path = self.project_file
+        _project_name = self.project_name or os.path.splitext(os.path.basename(_project_file_path))[0]
+
+        raw_df = pd.read_csv(_project_file_path, nrows=5)
+        if not self.easting_col:
+            self.easting_col = MagnetoPyFilesHelper.detect_column(raw_df.columns, 'longitude')
+            if not self.easting_col:
+                raise ValueError(f"Could not auto-detect easting/longitude column from headers: {list(raw_df.columns)}")
+            self.__magnetopy_logging.info(f'Auto-detected easting column: {self.easting_col}')
+
+        if not self.northing_col:
+            self.northing_col = MagnetoPyFilesHelper.detect_column(raw_df.columns, 'latitude')
+            if not self.northing_col:
+                raise ValueError(f"Could not auto-detect northing/latitude column from headers: {list(raw_df.columns)}")
+            self.__magnetopy_logging.info(f'Auto-detected northing column: {self.northing_col}')
+
+        if not self.magnetic_field_col:
+            self.magnetic_field_col = MagnetoPyFilesHelper.detect_column(raw_df.columns, 'magnetic_field')
+            if not self.magnetic_field_col:
+                raise ValueError(f"Could not auto-detect magnetic field column from headers: {list(raw_df.columns)}")
+            self.__magnetopy_logging.info(f'Auto-detected magnetic field column: {self.magnetic_field_col}')
+
         project_df = MagnetoPyFilesHelper.read_and_verify_columns(
             self.project_file,
             [self.easting_col, self.northing_col, self.magnetic_field_col] + ([self.upward_col] if self.upward_col else []),
@@ -178,12 +200,12 @@ class ReductionToPole:
             magnetization_declination=magnetization_declination,
         )
 
-        output_dir = os.path.abspath(os.path.join(os.path.dirname(self.project_file), '..'))
-        output_dir = os.path.join(output_dir, self.project_name)
+        output_dir = os.path.abspath('resources')
+        output_dir = os.path.join(output_dir, _project_name)
         os.makedirs(output_dir, exist_ok=True)
 
         timestamp = pd.Timestamp.now().strftime('%Y-%m-%d_%H%M%S')
-        output_file = os.path.join(output_dir, f'{self.project_name}_{timestamp}.csv')
+        output_file = os.path.join(output_dir, f'{_project_name}_{timestamp}.csv')
 
         reduced_df = reduced.to_dataframe(name='reduction_to_pole').reset_index()
         reduced_df.to_csv(output_file, index=False)

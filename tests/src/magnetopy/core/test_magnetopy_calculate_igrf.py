@@ -90,6 +90,32 @@ class TestCalculateIGRF(unittest.TestCase):
 
         os.remove(output_file_path)
 
+    def test_calculate_igrf_auto_detection(self):
+        """
+        Test calculate-igrf using auto-detection for date, columns, and project_name.
+        """
+        arguments = Namespace(
+            project_name=None,
+            stations_file=os.path.abspath('resources/data_examples/cerritos_datos_estaciones.csv'),
+            stations_cols=None,
+            altitude=1.920,
+            date=None,
+            verbose=False,
+        )
+
+        CalculateIGRF(arguments=arguments)
+
+        output_folder = os.path.abspath('resources/cerritos_datos_estaciones')
+        output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
+        output_file_path = os.path.join(output_folder, output_file)
+        output_df = pd.read_csv(output_file_path)
+
+        self.assertIn('mag_anomaly(nT)', output_df.columns)
+        self.assertIn('F(nT)', output_df.columns)
+        self.assertEqual(len(output_df), 44)
+
+        os.remove(output_file_path)
+
 
 if __name__ == '__main__':
     unittest.main()

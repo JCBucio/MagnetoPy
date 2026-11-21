@@ -8,6 +8,59 @@ from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 
 
 class MagnetoPyFilesHelper:
+    COMMON_ALIASES = {
+        'date': ['date', 'fecha', 'dia', 'day', 'sta_date', 'base_date'],
+        'time': ['time', 'hora', 'timestamp', 'time_utc', 'time_local', 'sta_time', 'base_time'],
+        'latitude': ['latitude', 'lat', 'gpslat', 'northing', 'north', 'y', 'norte', 'sta_latitude', 'sta_gpslat'],
+        'longitude': ['longitude', 'lon', 'long', 'gpslon', 'easting', 'east', 'x', 'este', 'sta_longitude', 'sta_gpslon'],
+        'magnetic_field': ['mag_anomaly(nt)', 'diurnal_var_corr', 'magfield', 'mag', 'magnetic_field', 'nt', 'total_field', 'field', 'f', 'campo', 'sta_magfield', 'sta_magnetic_field', 'base_nt', 'base_magfield'],
+    }
+
+    @staticmethod
+    def detect_column(df_columns, role: str):
+        """
+        Finds the first matching column name for a given geophysical role.
+        """
+        aliases = MagnetoPyFilesHelper.COMMON_ALIASES.get(role, [])
+        lower_cols = {str(col).strip().lower(): col for col in df_columns}
+        for alias in aliases:
+            if alias.lower() in lower_cols:
+                return lower_cols[alias.lower()]
+        return None
+
+    @staticmethod
+    def detect_stations_columns(df_columns):
+        """
+        Auto-detects [date, time, latitude, longitude, magnetic_field] from dataframe columns.
+        """
+        roles = ['date', 'time', 'latitude', 'longitude', 'magnetic_field']
+        detected = []
+        for role in roles:
+            col = MagnetoPyFilesHelper.detect_column(df_columns, role)
+            if col is None:
+                raise ValueError(
+                    f"Could not auto-detect '{role}' column from dataset headers: {list(df_columns)}. "
+                    f"Please specify --stations_cols explicitly."
+                )
+            detected.append(col)
+        return detected
+
+    @staticmethod
+    def detect_base_station_columns(df_columns):
+        """
+        Auto-detects [date, time, magnetic_field] from base station dataframe columns.
+        """
+        roles = ['date', 'time', 'magnetic_field']
+        detected = []
+        for role in roles:
+            col = MagnetoPyFilesHelper.detect_column(df_columns, role)
+            if col is None:
+                raise ValueError(
+                    f"Could not auto-detect '{role}' column from base station headers: {list(df_columns)}. "
+                    f"Please specify --base_station_cols explicitly."
+                )
+            detected.append(col)
+        return detected
     @staticmethod
     def validate_date(date_str):
         """

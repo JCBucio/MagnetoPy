@@ -34,8 +34,6 @@ class TestDiurnalVariation(unittest.TestCase):
         output_folder = os.path.abspath('resources/cerritos_test')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
         output_file_path = os.path.join(output_folder, output_file)
-        expected_output_file = os.path.abspath('resources/data_examples/cerritos_output.csv')
-
         output_df = pd.read_csv(output_file_path)
 
         expected_columns = [
@@ -62,6 +60,31 @@ class TestDiurnalVariation(unittest.TestCase):
 
         magnetopy_logging.info(f'File "{output_file_path}" deleted successfully.')
         magnetopy_logging.info('TestDiurnalVariation: test_diurnal_variation passed successfully.')
+
+    def test_diurnal_variation_auto_detection(self):
+        """
+        Test diurnal variation using column auto-detection (no explicit column flags or project name).
+        """
+        arguments = Namespace(
+            project_name=None,
+            stations_file=os.path.abspath('resources/data_examples/cerritos_datos_estaciones.csv'),
+            stations_cols=None,
+            base_station_file=os.path.abspath('resources/data_examples/cerritos_estaciones_base.csv'),
+            base_station_cols=None
+        )
+
+        DiurnalVariation(arguments=arguments)
+
+        output_folder = os.path.abspath('resources/cerritos_datos_estaciones')
+        output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
+        output_file_path = os.path.join(output_folder, output_file)
+
+        output_df = pd.read_csv(output_file_path)
+
+        self.assertIn('diurnal_var_corr', output_df.columns)
+        self.assertEqual(len(output_df), 44)
+
+        os.remove(output_file_path)
 
 if __name__ == '__main__':
     unittest.main()

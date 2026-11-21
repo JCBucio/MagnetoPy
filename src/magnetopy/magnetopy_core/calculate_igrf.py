@@ -1,5 +1,6 @@
 from argparse import Namespace
 from logging import getLogger
+import os
 import pandas as pd
 from scipy import interpolate
 
@@ -12,11 +13,11 @@ class CalculateIGRF:
     def __init__(self, arguments: Namespace):
         self.__magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='CalculateIGRF')
 
-        self.project_name: str = arguments.project_name
+        self.project_name: str | None = getattr(arguments, 'project_name', None)
         self.stations_file: str = arguments.stations_file
-        self.stations_cols: str = arguments.stations_cols
+        self.stations_cols: str | None = getattr(arguments, 'stations_cols', None)
         self.altitude: float = arguments.altitude
-        self.date: str = arguments.date
+        self.date: str | None = getattr(arguments, 'date', None)
         self.verbose: bool = getattr(arguments, 'verbose', False)
         
         self.__calculate_igrf()
@@ -62,11 +63,16 @@ class CalculateIGRF:
         """
         self.__magnetopy_logging.info('Performing the IGRF correction')
 
-        _project_name = self.project_name
         _stations_file_path = self.stations_file
-        _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
+        _project_name = self.project_name or os.path.splitext(os.path.basename(_stations_file_path))[0]
         _altitude = self.altitude
-        _date = self.date
+
+        raw_stations_df = pd.read_csv(_stations_file_path, nrows=5)
+        if self.stations_cols:
+            _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
+        else:
+            _stations_cols = MagnetoPyFilesHelper.detect_stations_columns(raw_stations_df.columns)
+            self.__magnetopy_logging.info(f'Auto-detected survey stations columns: {_stations_cols}')
 
         if len(_stations_cols) < 5:
             raise ValueError(
@@ -88,6 +94,13 @@ class CalculateIGRF:
         stations_df['datetime'] = pd.to_datetime(stations_df[_stations_cols[0]] + ' ' + stations_df[_stations_cols[1]])
 
         stations_df['decimal_date'] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyConversionsHelper.convert_date_to_decimal_date(x))
+
+        # Auto-detect date from first record if omitted
+        if not self.date:
+            _date = str(stations_df[_stations_cols[0]].iloc[0])
+            self.__magnetopy_logging.info(f'Auto-detected survey date from data: {_date}')
+        else:
+            _date = self.date
 
         date = MagnetoPyConversionsHelper.convert_date_to_decimal_date(_date)
 

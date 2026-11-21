@@ -1,5 +1,6 @@
 from argparse import Namespace
 from logging import getLogger
+import os
 import pandas as pd
 
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
@@ -9,11 +10,11 @@ class DiurnalVariation:
     def __init__(self, arguments: Namespace):
         self.__magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='DiurnalVariation')
 
-        self.project_name: str = arguments.project_name
+        self.project_name: str | None = getattr(arguments, 'project_name', None)
         self.stations_file: str = arguments.stations_file
-        self.stations_cols: str = arguments.stations_cols
+        self.stations_cols: str | None = getattr(arguments, 'stations_cols', None)
         self.base_station_file: str = arguments.base_station_file
-        self.base_station_cols: str = arguments.base_station_cols
+        self.base_station_cols: str | None = getattr(arguments, 'base_station_cols', None)
 
         self.__diurnal_variation()
 
@@ -26,11 +27,24 @@ class DiurnalVariation:
         """
         self.__magnetopy_logging.info('Validating datasets and columns')
 
-        _project_name = self.project_name
         _stations_file_path = self.stations_file
-        _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
         _base_station_file_path = self.base_station_file
-        _base_station_cols = [col.strip() for col in self.base_station_cols.split(',')]
+        _project_name = self.project_name or os.path.splitext(os.path.basename(_stations_file_path))[0]
+
+        raw_stations_df = pd.read_csv(_stations_file_path, nrows=5)
+        raw_base_df = pd.read_csv(_base_station_file_path, nrows=5)
+
+        if self.stations_cols:
+            _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
+        else:
+            _stations_cols = MagnetoPyFilesHelper.detect_stations_columns(raw_stations_df.columns)
+            self.__magnetopy_logging.info(f'Auto-detected survey stations columns: {_stations_cols}')
+
+        if self.base_station_cols:
+            _base_station_cols = [col.strip() for col in self.base_station_cols.split(',')]
+        else:
+            _base_station_cols = MagnetoPyFilesHelper.detect_base_station_columns(raw_base_df.columns)
+            self.__magnetopy_logging.info(f'Auto-detected base station columns: {_base_station_cols}')
 
         if len(_stations_cols) < 5:
             raise ValueError(

@@ -19,8 +19,8 @@ class PlotMap:
         self.__magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='PlotMap')
 
         self.project_file: str = arguments.project_file
-        self.latitude_col: str = arguments.latitude_col
-        self.longitude_col: str = arguments.longitude_col
+        self.latitude_col: str | None = getattr(arguments, 'latitude_col', None)
+        self.longitude_col: str | None = getattr(arguments, 'longitude_col', None)
 
         self.__plot_map()
 
@@ -52,8 +52,23 @@ class PlotMap:
         self.__magnetopy_logging.info('Reading the project file and plotting the geographic points')
 
         _project_file_path = self.project_file
-        _latitude_col = self.latitude_col
-        _longitude_col = self.longitude_col
+
+        raw_df = pd.read_csv(_project_file_path, nrows=5)
+        if self.latitude_col:
+            _latitude_col = self.latitude_col
+        else:
+            _latitude_col = MagnetoPyFilesHelper.detect_column(raw_df.columns, 'latitude')
+            if not _latitude_col:
+                raise ValueError(f"Could not auto-detect latitude column from headers: {list(raw_df.columns)}. Specify --latitude_col.")
+            self.__magnetopy_logging.info(f'Auto-detected latitude column: {_latitude_col}')
+
+        if self.longitude_col:
+            _longitude_col = self.longitude_col
+        else:
+            _longitude_col = MagnetoPyFilesHelper.detect_column(raw_df.columns, 'longitude')
+            if not _longitude_col:
+                raise ValueError(f"Could not auto-detect longitude column from headers: {list(raw_df.columns)}. Specify --longitude_col.")
+            self.__magnetopy_logging.info(f'Auto-detected longitude column: {_longitude_col}')
 
         project_df = MagnetoPyFilesHelper.read_and_verify_columns(_project_file_path, [_latitude_col, _longitude_col])
 

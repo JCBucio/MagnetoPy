@@ -120,11 +120,11 @@ class MagnetopyParser:
 
     def __validate_required_arguments(self, arguments: argparse.Namespace) -> None:
         required_by_command = {
-            'diurnal-variation': ['project_name', 'stations_file', 'stations_cols', 'base_station_file', 'base_station_cols'],
-            'calculate-igrf': ['project_name', 'stations_file', 'stations_cols', 'altitude', 'date'],
-            'plot-profile': ['project_file', 'col_to_plot'],
-            'plot-map': ['project_file', 'latitude_col', 'longitude_col'],
-            'reduction-to-pole': ['project_name', 'project_file', 'easting_col', 'northing_col', 'magnetic_field_col', 'inclination', 'declination'],
+            'diurnal-variation': ['stations_file', 'base_station_file'],
+            'calculate-igrf': ['stations_file', 'altitude'],
+            'plot-profile': ['project_file'],
+            'plot-map': ['project_file'],
+            'reduction-to-pole': ['project_file', 'inclination', 'declination'],
         }
 
         command_name = getattr(arguments, 'command', None)
@@ -154,42 +154,56 @@ class MagnetopyParser:
         diurnal_variation = self.__subparsers.add_parser(
             'diurnal-variation',
             help='MagnetoPy command that calculates the diurnal variation in a dataset.',
-            description='MagnetoPy command that calculates the diurnal variation in a dataset. It requires a stations file and a base station file to perform the calculations.'
+            description='MagnetoPy command that calculates the diurnal variation in a dataset. Supports positional files and column auto-detection.'
         )
         self.__add_config_argument(diurnal_variation)
+        diurnal_variation.add_argument(
+            'stations_file_pos',
+            nargs='?',
+            metavar='STATIONS_FILE',
+            help='Survey stations CSV file path.',
+            default=None
+        )
+        diurnal_variation.add_argument(
+            'base_station_file_pos',
+            nargs='?',
+            metavar='BASE_STATION_FILE',
+            help='Base station CSV file path.',
+            default=None
+        )
         diurnal_variation.add_argument(
             '--project_name',
             '-p',
             type=str,
-            help='Project name (without spaces or special characters) to name the folder where the output will be saved (required).',
+            help='Project name (optional, defaults to stations file name).',
             default=None
         )
         diurnal_variation.add_argument(
             '--stations_file',
             '-s',
             type=str,
-            help='Stations file path (required).',
+            help='Stations file path (optional if passed positionally).',
             default=None
         )
         diurnal_variation.add_argument(
             '--stations_cols',
             '-c',
             type=str,
-            help='Stations file columns names separated by commas without spaces (required). In the following order: date,time,latitude,longitude,magnetic_field.',
+            help='Stations file columns (optional, auto-detected if omitted). Order: date,time,latitude,longitude,magnetic_field.',
             default=None
         )
         diurnal_variation.add_argument(
             '--base_station_file',
             '-b',
             type=str,
-            help='Base station file path (required).',
+            help='Base station file path (optional if passed positionally).',
             default=None
         )
         diurnal_variation.add_argument(
             '--base_station_cols',
             '-B',
             type=str,
-            help='Base station file columns names separated by commas (required). In the following order: date,time,magnetic_field.',
+            help='Base station file columns (optional, auto-detected if omitted). Order: date,time,magnetic_field.',
             default=None
         )
     
@@ -203,28 +217,14 @@ class MagnetopyParser:
         calculate_igrf = self.__subparsers.add_parser(
             'calculate-igrf',
             help='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.',
-            description='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.'
+            description='Command that performs the IGRF-14 correction and computes total magnetic anomaly. Supports positional file and auto-detection.'
         )
         self.__add_config_argument(calculate_igrf)
         calculate_igrf.add_argument(
-            '--project_name',
-            '-p',
-            type=str,
-            help='Project name (without spaces or special characters) to name the folder where the output will be saved (required).',
-            default=None
-        )
-        calculate_igrf.add_argument(
-            '--stations_file',
-            '-s',
-            type=str,
-            help='Stations file path (required).',
-            default=None
-        )
-        calculate_igrf.add_argument(
-            '--stations_cols',
-            '-c',
-            type=str,
-            help='Stations file columns separated by commas without spaces (required). In the following order: date,time,latitude,longitude,magnetic_field.',
+            'stations_file_pos',
+            nargs='?',
+            metavar='STATIONS_FILE',
+            help='Survey stations CSV file path.',
             default=None
         )
         calculate_igrf.add_argument(
@@ -235,16 +235,37 @@ class MagnetopyParser:
             default=None
         )
         calculate_igrf.add_argument(
+            '--project_name',
+            '-p',
+            type=str,
+            help='Project name (optional, defaults to stations file name).',
+            default=None
+        )
+        calculate_igrf.add_argument(
+            '--stations_file',
+            '-s',
+            type=str,
+            help='Stations file path (optional if passed positionally).',
+            default=None
+        )
+        calculate_igrf.add_argument(
+            '--stations_cols',
+            '-c',
+            type=str,
+            help='Stations file columns (optional, auto-detected if omitted). Order: date,time,latitude,longitude,magnetic_field.',
+            default=None
+        )
+        calculate_igrf.add_argument(
             '--date',
             '-d',
             type=str,
-            help='Date in format YYYY-MM-DD (required).',
+            help='Date in format YYYY-MM-DD (optional, auto-detected from stations file if omitted).',
             default=None
         )
         calculate_igrf.add_argument(
             '--verbose',
             action='store_true',
-            help='Include the secular variation columns in the output CSV. By default only the main IGRF components are included.'
+            help='Include secular variation columns in output CSV.'
         )
 
     def __add_plot_profile_arguments(self) -> None:
@@ -257,21 +278,35 @@ class MagnetopyParser:
         plot_profile = self.__subparsers.add_parser(
             'plot-profile',
             help='Command that reads the project file and plots the profile of the selected column.',
-            description='Command that reads the project file and plots the profile of the selected column.'
+            description='Command that reads the project file and plots the profile of the selected column. Supports positional file and column auto-detection.'
         )
         self.__add_config_argument(plot_profile)
+        plot_profile.add_argument(
+            'project_file_pos',
+            nargs='?',
+            metavar='FILE',
+            help='Project CSV file path.',
+            default=None
+        )
+        plot_profile.add_argument(
+            'col_to_plot_pos',
+            nargs='?',
+            metavar='COLUMN',
+            help='Column to plot (optional, auto-detects magnetic field / anomaly column if omitted).',
+            default=None
+        )
         plot_profile.add_argument(
             '--project_file',
             '-f',
             type=str,
-            help='Project file path (required).',
+            help='Project file path (optional if passed positionally).',
             default=None
         )
         plot_profile.add_argument(
             '--col_to_plot',
             '-C',
             type=str,
-            help='Column to plot (required).',
+            help='Column to plot (optional, auto-detected if omitted).',
             default=None
         )
 
@@ -285,28 +320,35 @@ class MagnetopyParser:
         plot_map = self.__subparsers.add_parser(
             'plot-map',
             help='Command that reads the data file and plots the points on a geographic map.',
-            description='Command that reads the data file and plots the points on a geographic map.'
+            description='Command that reads the data file and plots the points on a geographic map. Supports positional file and coordinate auto-detection.'
         )
         self.__add_config_argument(plot_map)
+        plot_map.add_argument(
+            'project_file_pos',
+            nargs='?',
+            metavar='FILE',
+            help='Project CSV file path.',
+            default=None
+        )
         plot_map.add_argument(
             '--project_file',
             '-f',
             type=str,
-            help='Project CSV file path (required).',
+            help='Project CSV file path (optional if passed positionally).',
             default=None
         )
         plot_map.add_argument(
             '--latitude_col',
             '-lat',
             type=str,
-            help='Latitude column name in the CSV file (required).',
+            help='Latitude column name in CSV (optional, auto-detected if omitted).',
             default=None
         )
         plot_map.add_argument(
             '--longitude_col',
             '-lon',
             type=str,
-            help='Longitude column name in the CSV file (required).',
+            help='Longitude column name in CSV (optional, auto-detected if omitted).',
             default=None
         )
 
@@ -320,42 +362,14 @@ class MagnetopyParser:
         reduction_to_pole = self.__subparsers.add_parser(
             'reduction-to-pole',
             help='Command that computes a reduction-to-pole magnetic grid using Harmonica.',
-            description='Command that computes a reduction-to-pole magnetic grid using Harmonica.'
+            description='Command that computes a reduction-to-pole magnetic grid using Harmonica. Supports positional file and coordinate/field auto-detection.'
         )
         self.__add_config_argument(reduction_to_pole)
         reduction_to_pole.add_argument(
-            '--project_name',
-            '-p',
-            type=str,
-            help='Project name (without spaces or special characters) to name the folder where the output will be saved (required).',
-            default=None
-        )
-        reduction_to_pole.add_argument(
-            '--project_file',
-            '-f',
-            type=str,
-            help='Project CSV file path containing a regular magnetic grid. Expected columns: easting, northing and magnetic_field (required).',
-            default=None
-        )
-        reduction_to_pole.add_argument(
-            '--easting_col',
-            '-e',
-            type=str,
-            help='Easting coordinate column name in the CSV file (required).',
-            default=None
-        )
-        reduction_to_pole.add_argument(
-            '--northing_col',
-            '-n',
-            type=str,
-            help='Northing coordinate column name in the CSV file (required).',
-            default=None
-        )
-        reduction_to_pole.add_argument(
-            '--magnetic_field_col',
-            '-m',
-            type=str,
-            help='Magnetic field values column name in the CSV file (required).',
+            'project_file_pos',
+            nargs='?',
+            metavar='FILE',
+            help='Project CSV file path containing magnetic grid data.',
             default=None
         )
         reduction_to_pole.add_argument(
@@ -368,32 +382,68 @@ class MagnetopyParser:
         reduction_to_pole.add_argument(
             '--declination',
             '-D',
+            '-d',
             type=float,
             help='Declination of the inducing geomagnetic field in degrees (required).',
             default=None
         )
         reduction_to_pole.add_argument(
+            '--project_name',
+            '-p',
+            type=str,
+            help='Project name (optional, defaults to input file name).',
+            default=None
+        )
+        reduction_to_pole.add_argument(
+            '--project_file',
+            '-f',
+            type=str,
+            help='Project CSV file path (optional if passed positionally).',
+            default=None
+        )
+        reduction_to_pole.add_argument(
+            '--easting_col',
+            '-e',
+            type=str,
+            help='Easting/longitude column (optional, auto-detected if omitted).',
+            default=None
+        )
+        reduction_to_pole.add_argument(
+            '--northing_col',
+            '-n',
+            type=str,
+            help='Northing/latitude column (optional, auto-detected if omitted).',
+            default=None
+        )
+        reduction_to_pole.add_argument(
+            '--magnetic_field_col',
+            '-m',
+            type=str,
+            help='Magnetic field column (optional, auto-detected if omitted).',
+            default=None
+        )
+        reduction_to_pole.add_argument(
             '--magnetization_inclination',
             type=float,
-            help='Optional magnetization inclination in degrees. Defaults to the inducing field inclination.',
+            help='Optional magnetization inclination in degrees. Defaults to inducing field inclination.',
             default=None
         )
         reduction_to_pole.add_argument(
             '--magnetization_declination',
             type=float,
-            help='Optional magnetization declination in degrees. Defaults to the inducing field declination.',
+            help='Optional magnetization declination in degrees. Defaults to inducing field declination.',
             default=None
         )
         reduction_to_pole.add_argument(
             '--upward_col',
             type=str,
-            help='Optional altitude/upward coordinate column. Used when the observation height varies significantly, especially with equivalent-sources approximation.',
+            help='Optional altitude/upward coordinate column.',
             default=None
         )
         reduction_to_pole.add_argument(
             '--equivalent-sources',
             action='store_true',
-            help='Use the Harmonica equivalent-sources approximation instead of the default Verde spline interpolation. This is particularly useful when the data have strong altitude variations, such as in aeromagnetic surveys.'
+            help='Use Harmonica equivalent-sources approximation instead of default Verde spline interpolation.'
         )
 
     def get_arguments(self) -> argparse.Namespace:
@@ -415,7 +465,23 @@ class MagnetopyParser:
             self.__magnetopy_parser.print_help()
             exit(1)
 
+        # Fallback from positional arguments if flags were not provided
+        if getattr(arguments, 'stations_file_pos', None) and not getattr(arguments, 'stations_file', None):
+            arguments.stations_file = arguments.stations_file_pos
+        if getattr(arguments, 'base_station_file_pos', None) and not getattr(arguments, 'base_station_file', None):
+            arguments.base_station_file = arguments.base_station_file_pos
+        if getattr(arguments, 'project_file_pos', None) and not getattr(arguments, 'project_file', None):
+            arguments.project_file = arguments.project_file_pos
+        if getattr(arguments, 'col_to_plot_pos', None) and not getattr(arguments, 'col_to_plot', None):
+            arguments.col_to_plot = arguments.col_to_plot_pos
+
         arguments = self.__merge_config_into_arguments(arguments)
+
+        # Auto-derive project_name from input filename if omitted
+        target_file = getattr(arguments, 'stations_file', None) or getattr(arguments, 'project_file', None)
+        if target_file and not getattr(arguments, 'project_name', None):
+            arguments.project_name = os.path.splitext(os.path.basename(target_file))[0]
+
         self.__validate_required_arguments(arguments)
 
         return arguments

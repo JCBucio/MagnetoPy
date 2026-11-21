@@ -28,25 +28,39 @@ python magnetopy.py <command> --help
 
 ___
 ### diurnal-variation
-    Command: diurnal-variation [options]
+    Command: diurnal-variation <stations_file> <base_station_file> [options]
 
-    MagnetoPy command that calculate the diurnal variation using field data and base station registers.
+    MagnetoPy command that calculates the diurnal variation using field survey data and base station records.
+    Columns (date, time, coordinates, magnetic field) and project name are auto-detected by default.
 
-    --project_name <value>          Project name (required).
-    --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).
-    --stations_cols <value>         Stations file columns names in the following order: date, time, latitude, longitude and magnetic_field (required).
-    --base_station_file <value>     Base station file path containing date, time and magfield of the study (required).
-    --base_stations_cols <value>    Base station columns names in the following order: date, time and magnetic_field (required).
+    Positional arguments:
+    STATIONS_FILE                   Survey stations CSV file path.
+    BASE_STATION_FILE               Base station CSV file path.
 
-        Example:
+    Optional flags (overrides):
+    --project_name <value>          Project name (defaults to stations file name).
+    --stations_file <value>         Stations file path (if not passed positionally).
+    --stations_cols <value>         Stations columns in order: date, time, latitude, longitude, magnetic_field.
+    --base_station_file <value>     Base station file path (if not passed positionally).
+    --base_station_cols <value>     Base station columns in order: date, time, magnetic_field.
+
+        Fast Field Example (auto-detects columns):
+
+```sh
+python magnetopy.py diurnal-variation \
+    resources/data_examples/cerritos_datos_estaciones.csv \
+    resources/data_examples/cerritos_estaciones_base.csv
+```
+
+        Explicit Flags Example:
 
 ```sh
 python magnetopy.py diurnal-variation \
     --project_name cerritos_test \
     --stations_file resources/data_examples/cerritos_datos_estaciones.csv \
-    --stations_cols date,time,latitude,longitude,magfield \
+    --stations_cols date,time,gpslat,gpslon,magfield \
     --base_station_file resources/data_examples/cerritos_estaciones_base.csv \
-    --base_station_cols date,time,magfield
+    --base_station_cols date,time,nT
 ```
 
 Output columns
@@ -69,18 +83,34 @@ This means the final corrected field is the station field corrected by the estim
 
 ___
 ### calculate-igrf
-    Command: calculate-igrf [options]
+    Command: calculate-igrf <stations_file> --altitude <km> [options]
 
-    MagnetoPy command that calculate the total magnetic field intensity from the IGRF-14 coefficients using field data and base stations.
+    MagnetoPy command that calculates the geomagnetic reference field (IGRF-14) and computes
+    the total magnetic anomaly (residual) for the survey dataset.
+    Columns, survey date, and project name are auto-detected by default.
 
-    --project_name <value>          Project name (required).
-    --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).
-    --stations_cols <value>         Stations file columns names in the following order: date, time, latitude, longitude and magnetic_field (required).
+    Positional arguments:
+    STATIONS_FILE                   Survey stations CSV file path.
+
+    Required flags:
     --altitude <value>              Altitude of the study area in kilometers (required).
-    --date <value>                  Date of the study in the format YYYY-MM-DD (required).
-    --verbose                       Include the IGRF secular-variation columns in the output CSV.
 
-        Example:
+    Optional flags (overrides):
+    --date <value>                  Date of the study in format YYYY-MM-DD (auto-detected from survey data if omitted).
+    --project_name <value>          Project name (defaults to stations file name).
+    --stations_file <value>         Stations file path (if not passed positionally).
+    --stations_cols <value>         Stations columns in order: date, time, latitude, longitude, magnetic_field.
+    --verbose                       Include IGRF secular-variation columns in output CSV.
+
+        Fast Field Example (auto-detects date & columns):
+
+```sh
+python magnetopy.py calculate-igrf \
+    resources/data_examples/cerritos_datos_estaciones.csv \
+    --altitude 1.920
+```
+
+        Explicit Flags Example:
 
 ```sh
 python magnetopy.py calculate-igrf \
@@ -125,72 +155,88 @@ These `SV_*` columns describe the secular variation of the IGRF field model, i.e
 
 ___
 ### plot-profile
-    Command: plot-profile [options]
+    Command: plot-profile <file> [column] [options]
 
-    MagnetoPy command that plot the profile of a selected column in the data.
+    MagnetoPy command that plots the profile of a selected column in the data.
+    Automatically detects the magnetic field / anomaly column if omitted.
 
-    --project_file <value>          Project file to be read (required).
-    --col_to_plot <value>           Column to plot (required).
+    Positional arguments:
+    FILE                            Project CSV file to be read.
+    COLUMN                          Column to plot (optional, auto-detects magnetic/anomaly column if omitted).
 
-        Example:
+    Optional flags:
+    --project_file <value>          Project file path (if not passed positionally).
+    --col_to_plot <value>           Column to plot (if not passed positionally).
+
+        Fast Field Example:
+
+```sh
+python magnetopy.py plot-profile resources/cerritos_test/cerritos_test_2026-05-08_223841.csv
+```
+
+        With Explicit Column:
 
 ```sh
 python magnetopy.py plot-profile \
-    --project_file resources/cerritos_test/cerritos_test_2026-05-08_223841.csv \
-    --col_to_plot diurnal_var_corr
+    resources/cerritos_test/cerritos_test_2026-05-08_223841.csv \
+    diurnal_var_corr
 ```
 
 ___
 
 ### plot-map
-        Command: plot-map [options]
+    Command: plot-map <file> [options]
 
-        MagnetoPy command that plots geographic locations of magnetic data points contained in a CSV file. Useful to quickly visualise station distributions.
+    MagnetoPy command that plots geographic locations of magnetic data points contained in a CSV file.
+    Coordinates (latitude and longitude) are auto-detected by default.
 
-        --project_file <value>          Project CSV file path to be read (required).
-        --latitude_col <value>          Column name containing latitude values in the CSV (required).
-        --longitude_col <value>         Column name containing longitude values in the CSV (required).
+    Positional arguments:
+    FILE                            Project CSV file path.
 
-        Example:
+    Optional flags:
+    --project_file <value>          Project CSV file path (if not passed positionally).
+    --latitude_col <value>          Column name containing latitude values (auto-detected if omitted).
+    --longitude_col <value>         Column name containing longitude values (auto-detected if omitted).
+
+        Fast Field Example (auto-detects coordinates):
 
 ```sh
-python magnetopy.py plot-map \
-    --project_file resources/data_examples/cerritos_datos_estaciones.csv \
-    --latitude_col gpslat \
-    --longitude_col gpslon
+python magnetopy.py plot-map resources/data_examples/cerritos_datos_estaciones.csv
 ```
 
         The command saves a PNG map next to the input CSV (e.g. `cerritos_datos_estaciones_map.png`).
+
+___
+
 ### reduction-to-pole
-    Command: reduction-to-pole [options]
+    Command: reduction-to-pole <file> --inclination <deg> --declination <deg> [options]
 
     MagnetoPy command that computes a reduction-to-pole magnetic grid using Harmonica.
-    If the input data are irregular, MagnetoPy automatically interpolates them to a regular grid
-    using a default Verde spline interpolation. If the user enables equivalent sources, the command
-    instead uses Harmonica's EquivalentSources approximation, which is useful for datasets with
-    significant altitude variation such as aeromagnetic surveys.
+    Coordinates, magnetic field column, and project name are auto-detected by default.
 
-    --project_name <value>             Project name to store the output CSV (required).
-    --project_file <value>             Input CSV file with geophysical grid data (required).
-    --easting_col <value>              Column name for easting coordinates (required).
-    --northing_col <value>             Column name for northing coordinates (required).
-    --magnetic_field_col <value>        Column name for magnetic field values (required).
-    --inclination <value>             Inclination of the inducing geomagnetic field in degrees (required).
-    --declination <value>             Declination of the inducing geomagnetic field in degrees (required).
-    --magnetization_inclination <value> Optional magnetization inclination in degrees. Defaults to the inducing field inclination.
-    --magnetization_declination <value> Optional magnetization declination in degrees. Defaults to the inducing field declination.
-    --upward_col <value>               Optional column containing altitude/upward coordinate values. Recommended when the survey has strong elevation variation.
-    --equivalent-sources               Use Harmonica EquivalentSources instead of the default Verde spline interpolation.
+    Positional arguments:
+    FILE                               Input CSV file with geophysical grid data.
 
-        Example with default spline interpolation:
+    Required flags:
+    --inclination <value>              Inclination of the inducing geomagnetic field in degrees (required).
+    --declination <value>              Declination of the inducing geomagnetic field in degrees (required).
+
+    Optional flags:
+    --project_name <value>             Project name to store output CSV (defaults to file name).
+    --project_file <value>             Input CSV file (if not passed positionally).
+    --easting_col <value>              Column name for easting coordinates (auto-detected if omitted).
+    --northing_col <value>             Column name for northing coordinates (auto-detected if omitted).
+    --magnetic_field_col <value>       Column name for magnetic field values (auto-detected if omitted).
+    --magnetization_inclination <val>  Optional magnetization inclination in degrees. Defaults to inducing field inclination.
+    --magnetization_declination <val>  Optional magnetization declination in degrees. Defaults to inducing field declination.
+    --upward_col <value>               Optional column containing altitude/upward coordinate values.
+    --equivalent-sources               Use Harmonica EquivalentSources instead of default Verde spline interpolation.
+
+        Fast Field Example (auto-detects grid columns):
 
 ```sh
 python magnetopy.py reduction-to-pole \
-    --project_name rtp_example \
-    --project_file resources/data_examples/irregular_grid.csv \
-    --easting_col easting \
-    --northing_col northing \
-    --magnetic_field_col magnetic_field \
+    resources/data_examples/irregular_grid.csv \
     --inclination 45 \
     --declination 0
 ```
