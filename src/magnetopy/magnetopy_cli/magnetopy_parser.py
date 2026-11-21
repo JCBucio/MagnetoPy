@@ -224,7 +224,7 @@ class MagnetopyParser:
             '--stations_cols',
             '-c',
             type=str,
-            help='Stations file columns in the following order: date, time, magfield, latitude and longitude (required).',
+            help='Stations file columns separated by commas without spaces (required). In the following order: date,time,latitude,longitude,magnetic_field.',
             default=None
         )
         calculate_igrf.add_argument(

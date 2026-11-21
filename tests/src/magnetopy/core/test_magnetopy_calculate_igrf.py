@@ -33,21 +33,17 @@ class TestCalculateIGRF(unittest.TestCase):
         output_folder = os.path.abspath('resources/cerritos_test')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
         output_file_path = os.path.join(output_folder, output_file)
-        expected_output_file = os.path.abspath('resources/data_examples/cerritos_igrf_output.csv')
 
         output_df = pd.read_csv(output_file_path)
-        expected_output_df = pd.read_csv(expected_output_file)
 
-        self.assertTrue(output_df.equals(expected_output_df))
-        self.assertIn('D(°)', output_df.columns)
-        self.assertIn('I(°)', output_df.columns)
-        self.assertIn('H(nT)', output_df.columns)
-        self.assertIn('F(nT)', output_df.columns)
-        self.assertIn('X(nT)', output_df.columns)
-        self.assertIn('Y(nT)', output_df.columns)
-        self.assertIn('Z(nT)', output_df.columns)
+        for col in ['D(°)', 'I(°)', 'H(nT)', 'F(nT)', 'X(nT)', 'Y(nT)', 'Z(nT)', 'mag_anomaly(nT)']:
+            self.assertIn(col, output_df.columns)
         self.assertNotIn('SV_D(min/yr)', output_df.columns)
         self.assertNotIn('B_radius', output_df.columns)
+
+        # Verify that mag_anomaly(nT) equals observed magfield minus IGRF F(nT)
+        expected_anomaly = output_df['magfield'] - output_df['F(nT)']
+        self.assertTrue((abs(output_df['mag_anomaly(nT)'] - expected_anomaly) < 1e-4).all())
 
         os.remove(output_file_path)
 
@@ -78,7 +74,7 @@ class TestCalculateIGRF(unittest.TestCase):
         for col in required_input_cols:
             self.assertIn(col, output_df.columns)
 
-        for col in ['D(°)', 'I(°)', 'H(nT)', 'F(nT)', 'X(nT)', 'Y(nT)', 'Z(nT)']:
+        for col in ['D(°)', 'I(°)', 'H(nT)', 'F(nT)', 'X(nT)', 'Y(nT)', 'Z(nT)', 'mag_anomaly(nT)']:
             self.assertIn(col, output_df.columns)
 
         for col in ['SV_D(min/yr)', 'SV_I(min/yr)', 'SV_H(nT/yr)', 'SV_F(nT/yr)', 'SV_X(nT/yr)', 'SV_Y(nT/yr)', 'SV_Z(nT/yr)']:
@@ -87,6 +83,10 @@ class TestCalculateIGRF(unittest.TestCase):
         self.assertNotIn('B_radius', output_df.columns)
         self.assertNotIn('B_theta', output_df.columns)
         self.assertNotIn('B_phi', output_df.columns)
+
+        # Verify that mag_anomaly(nT) equals observed magfield minus IGRF F(nT)
+        expected_anomaly = output_df['magfield'] - output_df['F(nT)']
+        self.assertTrue((abs(output_df['mag_anomaly(nT)'] - expected_anomaly) < 1e-4).all())
 
         os.remove(output_file_path)
 

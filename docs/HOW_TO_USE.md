@@ -75,7 +75,7 @@ ___
 
     --project_name <value>          Project name (required).
     --stations_file <value>         Stations file path containing date, time, magfield, latitude and longitude data of the study (required).
-    --stations_cols <value>         Stations file columns names in the following order: date, time, magfield, latitude and longitude (required).
+    --stations_cols <value>         Stations file columns names in the following order: date, time, latitude, longitude and magnetic_field (required).
     --altitude <value>              Altitude of the study area in kilometers (required).
     --date <value>                  Date of the study in the format YYYY-MM-DD (required).
     --verbose                       Include the IGRF secular-variation columns in the output CSV.
@@ -86,7 +86,7 @@ ___
 python magnetopy.py calculate-igrf \
     --project_name cerritos_test \
     --stations_file resources/data_examples/cerritos_datos_estaciones.csv \
-    --stations_cols date,time,magfield,latitude,longitude \
+    --stations_cols date,time,gpslat,gpslon,magfield \
     --altitude 1.920 \
     --date 2019-03-26
 ```
@@ -109,6 +109,7 @@ By default, the command writes the main magnetic field components and the statio
 - `X(nT)`: north component of the magnetic field, in nT.
 - `Y(nT)`: east component of the magnetic field, in nT.
 - `Z(nT)`: vertical component of the magnetic field, in nT.
+- `mag_anomaly(nT)`: total magnetic anomaly (residual), calculated as the observed magnetic field minus the IGRF total intensity (`F(nT)`).
 
 When the `--verbose` option is enabled, the following secular-variation columns are also added:
 

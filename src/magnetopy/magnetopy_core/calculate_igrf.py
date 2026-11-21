@@ -64,15 +64,24 @@ class CalculateIGRF:
 
         _project_name = self.project_name
         _stations_file_path = self.stations_file
-        _stations_cols = self.stations_cols.split(',')
+        _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
         _altitude = self.altitude
         _date = self.date
+
+        if len(_stations_cols) < 5:
+            raise ValueError(
+                "stations_cols requires 5 comma-separated columns in order: "
+                "date, time, latitude, longitude, magnetic_field"
+            )
 
         magnetopyIGRFHelper = MagnetoPyIGRFHelper()
 
         igrf = magnetopyIGRFHelper.load_igrf_coefficients()
 
         stations_df = MagnetoPyFilesHelper.read_and_verify_columns(_stations_file_path, _stations_cols)
+        if stations_df is None:
+            self.__magnetopy_logging.error('Error reading the stations file or verifying columns')
+            return
 
         stations_df[_stations_cols[0]] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyFilesHelper.validate_date(x))
         stations_df[_stations_cols[1]] = stations_df[_stations_cols[1]].apply(lambda x: MagnetoPyFilesHelper.validate_time(x))
@@ -82,8 +91,8 @@ class CalculateIGRF:
 
         date = MagnetoPyConversionsHelper.convert_date_to_decimal_date(_date)
 
-        lat_avg = stations_df[_stations_cols[2]].mean()
-        lon_avg = stations_df[_stations_cols[3]].mean()
+        lat_avg = pd.to_numeric(stations_df[_stations_cols[2]], errors='coerce').mean()
+        lon_avg = pd.to_numeric(stations_df[_stations_cols[3]], errors='coerce').mean()
 
         colat = 90 - lat_avg
 
@@ -154,6 +163,10 @@ class CalculateIGRF:
         )
 
         output_df = MagnetoPyFilesHelper.write_igrf_components_to_dataframe(stations_df, results)
+
+        # Calculate total magnetic anomaly: observed field minus IGRF total intensity F
+        mag_observed = pd.to_numeric(output_df[_stations_cols[4]], errors='coerce')
+        output_df['mag_anomaly(nT)'] = mag_observed - results['F(nT)']
 
         MagnetoPyFilesHelper.save_data(output_df, _project_name)
 
