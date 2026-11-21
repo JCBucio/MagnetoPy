@@ -28,12 +28,26 @@ class DiurnalVariation:
 
         _project_name = self.project_name
         _stations_file_path = self.stations_file
-        _stations_cols = self.stations_cols.split(',')
+        _stations_cols = [col.strip() for col in self.stations_cols.split(',')]
         _base_station_file_path = self.base_station_file
-        _base_station_cols = self.base_station_cols.split(',')
+        _base_station_cols = [col.strip() for col in self.base_station_cols.split(',')]
+
+        if len(_stations_cols) < 5:
+            raise ValueError(
+                "stations_cols requires 5 comma-separated columns in order: "
+                "date, time, latitude, longitude, magnetic_field"
+            )
+        if len(_base_station_cols) < 3:
+            raise ValueError(
+                "base_station_cols requires 3 comma-separated columns in order: "
+                "date, time, magnetic_field"
+            )
 
         stations_df = MagnetoPyFilesHelper.read_and_verify_columns(_stations_file_path, _stations_cols)
         base_stations_df = MagnetoPyFilesHelper.read_and_verify_columns(_base_station_file_path, _base_station_cols)
+        if stations_df is None or base_stations_df is None:
+            self.__magnetopy_logging.error('Error reading the input files or verifying columns')
+            return
 
         stations_df[_stations_cols[0]] = stations_df[_stations_cols[0]].apply(lambda x: MagnetoPyFilesHelper.validate_date(x))
         stations_df[_stations_cols[1]] = stations_df[_stations_cols[1]].apply(lambda x: MagnetoPyFilesHelper.validate_time(x))
@@ -42,31 +56,42 @@ class DiurnalVariation:
         base_stations_df[_base_station_cols[0]] = base_stations_df[_base_station_cols[0]].apply(lambda x: MagnetoPyFilesHelper.validate_date(x))
         base_stations_df[_base_station_cols[1]] = base_stations_df[_base_station_cols[1]].apply(lambda x: MagnetoPyFilesHelper.validate_time(x))
         base_stations_df['datetime'] = pd.to_datetime(base_stations_df[_base_station_cols[0]] + ' ' + base_stations_df[_base_station_cols[1]])
-        base_stations_df['magfield_mean'] = base_stations_df.groupby(base_stations_df[_base_station_cols[0]])[_base_station_cols[2]].transform('mean')
+
+        base_mag_numeric = pd.to_numeric(base_stations_df[_base_station_cols[2]], errors='coerce')
+        base_stations_df['magfield_mean'] = base_mag_numeric.groupby(base_stations_df[_base_station_cols[0]]).transform('mean')
 
         stations_df, base_stations_df = MagnetoPyFilesHelper.rename_columns(stations_df, base_stations_df)
         
         self.__magnetopy_logging.info('Performing the diurnal variation correction')
 
-        records = []
+        stations_df = stations_df.reset_index(drop=True)
+        stations_df['__order__'] = stations_df.index
+        stations_sorted = stations_df.sort_values('sta_datetime')
+        base_sorted = base_stations_df.sort_values('base_datetime')
 
-        for index, row in stations_df.iterrows():
-            stations_datetime = row['sta_datetime']
+        result_df = pd.merge_asof(
+            stations_sorted,
+            base_sorted,
+            left_on='sta_datetime',
+            right_on='base_datetime',
+            direction='nearest'
+        )
 
-            base_stations_df['time_diff'] = abs(base_stations_df['base_datetime'] - stations_datetime)
+        result_df['time_diff'] = (result_df['base_datetime'] - result_df['sta_datetime']).abs()
+        result_df = result_df.sort_values('__order__').drop(columns=['__order__']).reset_index(drop=True)
 
-            closest_index = base_stations_df['time_diff'].idxmin()
-            closest_record = base_stations_df.loc[closest_index]
+        max_gap = result_df['time_diff'].max()
+        if max_gap > pd.Timedelta(hours=1):
+            self.__magnetopy_logging.warning(
+                f'Large time difference detected between survey and base records: maximum gap is {max_gap}.'
+            )
 
-            records.append(closest_record)
+        base_mag = pd.to_numeric(result_df['base_' + _base_station_cols[2]], errors='coerce')
+        base_mean = pd.to_numeric(result_df['base_magfield_mean'], errors='coerce')
+        sta_mag = pd.to_numeric(result_df['sta_' + _stations_cols[4]], errors='coerce')
 
-        result_df = pd.DataFrame(records)
-        result_df = result_df.reset_index(drop=True)
-
-        result_df = pd.concat([stations_df, result_df], axis=1)
-
-        result_df['diurnal_var'] = result_df['base_' + _base_station_cols[2]] - result_df['base_magfield_mean']
-        result_df['diurnal_var_corr'] = result_df['sta_' + _stations_cols[4]] - result_df['diurnal_var']
+        result_df['diurnal_var'] = base_mag - base_mean
+        result_df['diurnal_var_corr'] = sta_mag - result_df['diurnal_var']
 
         self.__magnetopy_logging.info(f'Total records: {len(result_df)}')
 

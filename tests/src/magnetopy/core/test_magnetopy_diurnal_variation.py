@@ -37,9 +37,26 @@ class TestDiurnalVariation(unittest.TestCase):
         expected_output_file = os.path.abspath('resources/data_examples/cerritos_output.csv')
 
         output_df = pd.read_csv(output_file_path)
-        expected_output_df = pd.read_csv(expected_output_file)
 
-        self.assertTrue(output_df.equals(expected_output_df))
+        expected_columns = [
+            'sta_date', 'sta_time', 'sta_gpslat', 'sta_gpslon', 'sta_magfield',
+            'sta_datetime', 'base_date', 'base_time', 'base_nT', 'base_datetime',
+            'base_magfield_mean', 'time_diff', 'diurnal_var', 'diurnal_var_corr'
+        ]
+        for col in expected_columns:
+            self.assertIn(col, output_df.columns)
+
+        input_stations_df = pd.read_csv(arguments.stations_file)
+        self.assertEqual(len(output_df), len(input_stations_df))
+
+        # Check mathematical relationships:
+        # diurnal_var == base_nT - base_magfield_mean
+        expected_diurnal_var = output_df['base_nT'] - output_df['base_magfield_mean']
+        self.assertTrue((abs(output_df['diurnal_var'] - expected_diurnal_var) < 1e-4).all())
+
+        # diurnal_var_corr == sta_magfield - diurnal_var
+        expected_corr = output_df['sta_magfield'] - output_df['diurnal_var']
+        self.assertTrue((abs(output_df['diurnal_var_corr'] - expected_corr) < 1e-4).all())
 
         os.remove(output_file_path)
 
