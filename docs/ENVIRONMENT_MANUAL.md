@@ -70,7 +70,7 @@ Then run the CLI with the desired command. For example:
 
 ```sh
 python magnetopy.py --help
-python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml
+python magnetopy.py calculate-igrf resources/data_examples/cerritos_datos_estaciones.csv --altitude 1.92
 ```
 
 ---

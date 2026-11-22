@@ -20,7 +20,7 @@ Check the `docs/ENVIRONMENT_MANUAL.md` file to prepare your environment using Co
 
 ## Usage
 
-Check the `docs/HOW_TO_USE.md` file to learn how to use the CLI and the config-file workflow.
+Check the `docs/HOW_TO_USE.md` file to learn how to use the CLI.
 
 ## Quick start
 
@@ -37,32 +37,23 @@ conda activate magnetopy_env
 pip install -r requirements.txt
 ```
 
-3. Run the tool using config files (preferred workflow):
+3. Run the CLI directly using positional file arguments and auto-detection:
 
 ```bash
 # Diurnal variation
-python magnetopy.py diurnal-variation --config resources/config_templates/diurnal_variation_config.yaml
+python magnetopy.py diurnal-variation resources/data_examples/cerritos_datos_estaciones.csv resources/data_examples/cerritos_estaciones_base.csv
 
-# Calculate IGRF
-python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml
+# Calculate IGRF and total magnetic anomaly
+python magnetopy.py calculate-igrf resources/data_examples/cerritos_datos_estaciones.csv --altitude 1.92
 
 # Plot profile
-python magnetopy.py plot-profile --config resources/config_templates/plot_profile_config.yaml
+python magnetopy.py plot-profile resources/cerritos_datos_estaciones/cerritos_datos_estaciones_*.csv
 
 # Plot map
-python magnetopy.py plot-map --config resources/config_templates/plot_map_config.yaml
-
-# Reduction to pole
-python magnetopy.py reduction-to-pole --config resources/config_templates/reduction_to_pole_config.yaml
+python magnetopy.py plot-map resources/data_examples/cerritos_datos_estaciones.csv
 ```
 
-4. You can still override a value from the config file for a single run:
-
-```bash
-python magnetopy.py calculate-igrf --config resources/config_templates/calculate_igrf_config.yaml --date 2020-01-15
-```
-
-5. Inspect outputs in the `resources/` folder (CSV results, PNG plots).
+4. Inspect outputs in the `resources/` folder (CSV results, PNG plots).
 
 ## Troubleshooting
 

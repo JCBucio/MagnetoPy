@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import configparser
-import json
 import os
 from logging import getLogger
 
@@ -17,7 +15,6 @@ class MagnetopyParser:
             prog='MagnetoPy', 
             description='MagnetoPy is an open-source tool that performs magnetic data processing.'
             )
-        self.__add_config_argument(self.__magnetopy_parser)
         self.__subparsers = self.__magnetopy_parser.add_subparsers(
             title='commands',
             description='magnetopy commands',
@@ -25,98 +22,6 @@ class MagnetopyParser:
             help='Get help with: <magnetopy_command> --help'
         )
 
-    @staticmethod
-    def __normalize_config_key(key: str) -> str:
-        return key.strip().replace('-', '_')
-
-    @staticmethod
-    def __add_config_argument(parser: argparse.ArgumentParser) -> None:
-        parser.add_argument(
-            '--config',
-            type=str,
-            help='Optional config file path (JSON, YAML/YML, or INI). CLI arguments override values from the config file.'
-        )
-
-    def __load_config_file(self, config_path: str) -> dict:
-        """
-        Loads a configuration file into a dictionary, supporting JSON, YAML/YML, and INI formats.
-        """
-        if not config_path:
-            return {}
-
-        absolute_path = os.path.abspath(config_path)
-        if not os.path.exists(absolute_path):
-            raise FileNotFoundError(f'Config file not found: {absolute_path}')
-
-        extension = os.path.splitext(absolute_path)[1].lower()
-
-        if extension == '.json':
-            with open(absolute_path, 'r', encoding='utf-8') as config_file:
-                data = json.load(config_file)
-            if not isinstance(data, dict):
-                raise ValueError('The JSON config file must contain an object at the root.')
-            return data
-
-        if extension in {'.yaml', '.yml'}:
-            try:
-                import yaml
-            except ImportError as exc:
-                raise RuntimeError(
-                    'YAML config support requires PyYAML to be installed. Install it with "pip install pyyaml".'
-                ) from exc
-            with open(absolute_path, 'r', encoding='utf-8') as config_file:
-                data = yaml.safe_load(config_file)
-            if data is None:
-                return {}
-            if not isinstance(data, dict):
-                raise ValueError('The YAML config file must contain a dictionary at the root.')
-            return data
-
-        if extension in {'.ini', '.cfg'}:
-            config = configparser.ConfigParser()
-            config.read(absolute_path)
-            values = {}
-            for section in config.sections():
-                for key, value in config.items(section):
-                    values[self.__normalize_config_key(key)] = value
-            return values
-
-        raise ValueError(
-            'Unsupported config format. Use a .json, .yaml/.yml, or .ini/.cfg file.'
-        )
-
-    def __merge_config_into_arguments(self, arguments: argparse.Namespace) -> argparse.Namespace:
-        """
-        Merges values from the config file into the parsed arguments. CLI values remain authoritative.
-        """
-        config_path = getattr(arguments, 'config', None)
-        if not config_path:
-            return arguments
-
-        config_data = self.__load_config_file(config_path)
-
-        if not isinstance(config_data, dict):
-            raise ValueError('Configuration content must be a dictionary keyed by argument names.')
-
-        command_name = getattr(arguments, 'command', None)
-        command_section = None
-        if command_name is not None:
-            command_section = config_data.get(command_name)
-            if isinstance(command_section, dict):
-                config_data = {**config_data, **command_section}
-
-        normalized_config = {}
-        for key, value in config_data.items():
-            normalized_key = self.__normalize_config_key(str(key))
-            normalized_config[normalized_key] = value
-
-        for key, value in normalized_config.items():
-            if not hasattr(arguments, key):
-                continue
-            if getattr(arguments, key) is None:
-                setattr(arguments, key, value)
-
-        return arguments
 
     def __validate_required_arguments(self, arguments: argparse.Namespace) -> None:
         required_by_command = {
@@ -141,7 +46,7 @@ class MagnetopyParser:
         if missing_args:
             raise ValueError(
                 f"Missing required arguments for '{command_name}': {', '.join(missing_args)}. "
-                "Pass them directly on the CLI or provide them in the config file."
+                "Pass them directly on the CLI."
             )
 
     def __add_diurnal_variation_arguments(self) -> None:
@@ -156,7 +61,6 @@ class MagnetopyParser:
             help='MagnetoPy command that calculates the diurnal variation in a dataset.',
             description='MagnetoPy command that calculates the diurnal variation in a dataset. Supports positional files and column auto-detection.'
         )
-        self.__add_config_argument(diurnal_variation)
         diurnal_variation.add_argument(
             'stations_file_pos',
             nargs='?',
@@ -219,7 +123,6 @@ class MagnetopyParser:
             help='Command that performs the IGRF-14 correction to a data set based on the 14th generation coefficients.',
             description='Command that performs the IGRF-14 correction and computes total magnetic anomaly. Supports positional file and auto-detection.'
         )
-        self.__add_config_argument(calculate_igrf)
         calculate_igrf.add_argument(
             'stations_file_pos',
             nargs='?',
@@ -280,7 +183,6 @@ class MagnetopyParser:
             help='Command that reads the project file and plots the profile of the selected column.',
             description='Command that reads the project file and plots the profile of the selected column. Supports positional file and column auto-detection.'
         )
-        self.__add_config_argument(plot_profile)
         plot_profile.add_argument(
             'project_file_pos',
             nargs='?',
@@ -322,7 +224,6 @@ class MagnetopyParser:
             help='Command that reads the data file and plots the points on a geographic map.',
             description='Command that reads the data file and plots the points on a geographic map. Supports positional file and coordinate auto-detection.'
         )
-        self.__add_config_argument(plot_map)
         plot_map.add_argument(
             'project_file_pos',
             nargs='?',
@@ -364,7 +265,6 @@ class MagnetopyParser:
             help='Command that computes a reduction-to-pole magnetic grid using Harmonica.',
             description='Command that computes a reduction-to-pole magnetic grid using Harmonica. Supports positional file and coordinate/field auto-detection.'
         )
-        self.__add_config_argument(reduction_to_pole)
         reduction_to_pole.add_argument(
             'project_file_pos',
             nargs='?',
@@ -474,8 +374,6 @@ class MagnetopyParser:
             arguments.project_file = arguments.project_file_pos
         if getattr(arguments, 'col_to_plot_pos', None) and not getattr(arguments, 'col_to_plot', None):
             arguments.col_to_plot = arguments.col_to_plot_pos
-
-        arguments = self.__merge_config_into_arguments(arguments)
 
         # Auto-derive project_name from input filename if omitted
         target_file = getattr(arguments, 'stations_file', None) or getattr(arguments, 'project_file', None)
