@@ -181,11 +181,11 @@ class MagnetoPyFilesHelper:
         os.makedirs(new_folder_path, exist_ok=True)
         magnetopy_logging.info(f'Writing output data on path: {new_folder_path}')
         
-        time: str = str(datetime.now()).split('.')[0].replace(' ', '_').replace(':', '')
-        file = f'{project_name}_{time}.csv'
+        timestamp: str = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+        file = f'{project_name}_{timestamp}.csv'
         full_path = os.path.abspath(str(os.path.join(new_folder_path, file)))
 
-        result_df.to_csv(full_path)
+        result_df.to_csv(full_path, index=False)
 
     @staticmethod
     def most_recent_file(folder_path):
