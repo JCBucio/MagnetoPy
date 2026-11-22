@@ -119,86 +119,8 @@ class MagnetoPyIGRFHelper:
         thc   = np.rad2deg(np.arccos(cthc)) # arccos returns values in [0, pi]
         
         return rad, thc, sd, cd
-    
 
-    def geo_to_gg(self, radius, theta):
-        """
-        Compute geodetic colatitude and vertical height above the ellipsoid from
-        geocentric radius and colatitude.
 
-        Parameters
-        ----------
-        radius : ndarray, shape (...)
-            Geocentric radius in kilometers.
-        theta : ndarray, shape (...)
-            Geocentric colatitude in degrees.
-
-        Returns
-        -------
-        height : ndarray, shape (...)
-            Altitude in kilometers.
-        beta : ndarray, shape (...)
-            Geodetic colatitude
-
-        Notes
-        -----
-        Round-off errors might lead to a failure of the algorithm especially but
-        not exclusively for points close to the geographic poles. Corresponding
-        geodetic coordinates are returned as NaN.
-
-        References
-        ----------
-        Function uses Heikkinen's algorithm taken from:
-
-        Zhu, J., "Conversion of Earth-centered Earth-fixed coordinates to geodetic
-        coordinates", IEEE Transactions on Aerospace and Electronic Systems}, 1994,
-        vol. 30, num. 3, pp. 957-961
-
-        """
-        
-        # Use WGS-84 ellipsoid parameters
-        a =  6378.137  # equatorial radius
-        b =  6356.752  # polar radius
-        
-        a2 = a**2
-        b2 = b**2
-
-        e2 = (a2 - b2) / a2  # squared eccentricity
-        e4 = e2*e2
-        ep2 = (a2 - b2) / b2  # squared primed eccentricity
-
-        r = radius * np.sin(np.radians(theta))
-        z = radius * np.cos(np.radians(theta))
-
-        r2 = r**2
-        z2 = z**2
-
-        F = 54*b2*z2
-
-        G = r2 + (1. - e2)*z2 - e2*(a2 - b2)
-
-        c = e4*F*r2 / G**3
-
-        s = (1. + c + np.sqrt(c**2 + 2*c))**(1./3)
-
-        P = F / (3*(s + 1./s + 1.)**2 * G**2)
-
-        Q = np.sqrt(1. + 2*e4*P)
-
-        r0 = -P*e2*r / (1. + Q) + np.sqrt(0.5*a2*(1. + 1./Q) - P*(1. - e2)*z2 / (Q*(1. + Q)) - 0.5*P*r2)
-
-        U = np.sqrt((r - e2*r0)**2 + z2)
-
-        V = np.sqrt((r - e2*r0)**2 + (1. - e2)*z2)
-
-        z0 = b2*z/(a*V)
-
-        height = U*(1. - b2 / (a*V))
-
-        beta = 90. - np.degrees(np.arctan2(z + ep2*z0, r))
-
-        return height, beta
-    
     def synth_values(self, coeffs, radius, theta, phi, nmax=None, nmin=None, grid=None):
         """
         Based on code from : chaosmagpy, Clemens Kloss (DTU Space) and pyIGRF, Ciaran Beggan (British Geological Survey)
