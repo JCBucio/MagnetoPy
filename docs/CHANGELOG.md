@@ -122,3 +122,38 @@ Documentation:
 | reduction-to-pole          | Reduction to Pole calculation               | **Available**                               |
 | plot-profile               | Plot profile of a selected column           | Available                                   |
 | plot-map                  | Plot geographic locations of data points    | Available                                   |
+
+## MagnetoPy ```3.0.0``` (November 22nd, 2026)
+
+Radical simplification and architectural overhaul for fast, reliable operation:
+
+New features & Ergonomics:
+
+- **Total Magnetic Anomaly Calculation (`calculate-igrf`)**: Automatically computes `mag_anomaly(nT) = observed_field - F_IGRF` in the output CSV.
+- **Positional CLI & Smart Column Auto-Detection**: All 5 subcommands now accept positional file paths. Explicit flags (`--stations_cols`, `--base_station_cols`, `--latitude_col`, `--longitude_col`, `--col_to_plot`, `--easting_col`, `--northing_col`, `--date`, `--project_name`) are now optional and auto-detected using common field header aliases.
+- **Pure Matplotlib Map Plotting (`plot-map`)**: Replaced Cartopy with pure Matplotlib scatter plotting and aspect-ratio geographic correction ($1 / \cos(\text{lat})$). Removed external geospatial C-libraries (`PROJ`, `GEOS`) from system requirements.
+
+Performance & Stability:
+
+- **Vectorized Diurnal Correction**: Replaced $O(N \cdot M)$ nested `iterrows()` loops in `diurnal-variation` with `pd.merge_asof(direction='nearest')`. Execution time dropped from several minutes to milliseconds. Added gap warning for survey records separated by $>1$ hour from base-station coverage.
+- **CSV Index Integrity**: Standardized `save_data()` with `index=False` to eliminate corrupting unnamed index columns (`0, 1, 2...`) in output CSVs.
+- **Standardized Timestamps**: Replaced brittle string splitting with `%Y-%m-%d_%H%M%S` ISO formatting across outputs.
+
+Refactoring & Architecture:
+
+- **Purged External Config Subsystem**: Removed YAML/JSON/INI config file loader, merging mechanisms, and the `resources/config_templates/` directory in favor of zero-friction direct CLI execution.
+- **Purged Dead Code & Legacy Assets**: Removed uncalled `geo_to_gg()` inverse geodetic function and deleted legacy `resources/igrf13/` files (`IGRF13.shc`, `igrf13coeffs.csv`) since MagnetoPy strictly uses IGRF-14.
+- **Flattened Pseudo-OOP Architecture**: Refactored procedural pseudo-classes across all 5 core modules (`DiurnalVariation`, `CalculateIGRF`, `PlotProfile`, `PlotMap`, `ReductionToPole`) and `magnetopy.py` into clean, testable modular functions (`run_*()`) and a dictionary dispatch table.
+
+Documentation:
+
+- Updated `README.md`, `HOW_TO_USE.md`, and `FAQ.md` to reflect fast positional syntax and smart auto-detection.
+- Updated `docs/ENVIRONMENT_MANUAL.md` with best practices for virtual environment maintenance and removed Cartopy troubleshooting steps.
+
+| **Command**                | **Calculation**                             |**Status**                                   |
+|----------------------------|---------------------------------------------|---------------------------------------------|
+| diurnal-variation	         | Diurnal variation calculation               | Available                                   |
+| calculate-igrf	         | IGRF Coefficients & Total Magnetic Anomaly   | Available                                   |
+| reduction-to-pole          | Reduction to Pole calculation               | Available                                   |
+| plot-profile               | Plot profile of a selected column           | Available                                   |
+| plot-map                  | Plot geographic locations of data points    | Available                                   |
