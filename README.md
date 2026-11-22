@@ -10,7 +10,7 @@ MagnetoPy is an open-source Command Line Interface (CLI) written in Python, desi
 
 - **Profile plotting**: MagnetoPy command that reads a project CSV and plots the temporal or spatial profile of a selected column.
 
-- **Map plotting**: MagnetoPy command that displays geographic locations from a dataset as a map for quick spatial inspection.
+- **Map plotting**: MagnetoPy command that displays geographic locations from a dataset as a map for quick spatial inspection (pure matplotlib, no system geospatial libraries required).
 
 - **Reduction to the Pole (RTP)**: MagnetoPy command that compute the reduction to the pole of magnetic data using frequency domain calculations through Fast Fourier Transform.
 
@@ -54,28 +54,6 @@ python magnetopy.py plot-map resources/data_examples/cerritos_datos_estaciones.c
 ```
 
 4. Inspect outputs in the `resources/` folder (CSV results, PNG plots).
-
-## Troubleshooting
-
-Cartopy (used by the `plot-map` command) depends on system geospatial libraries which may not be present on all systems. If `pip install -r requirements.txt` fails for `cartopy`, try one of the following:
-
-- On Debian/Ubuntu, install system packages first:
-
-```bash
-sudo apt update && sudo apt install -y libproj-dev proj-data proj-bin libgeos-dev
-python -m pip install -r requirements.txt
-```
-
-- If you use Conda, prefer installing Cartopy and its binary dependencies from conda-forge:
-
-```bash
-conda create -n magnetopy_env python=3.11 -y
-conda activate magnetopy_env
-conda install -c conda-forge cartopy matplotlib pandas scipy numpy -y
-python -m pip install -r requirements.txt --no-deps
-```
-
-- If problems persist, consult the Cartopy installation notes: https://scitools.org.uk/cartopy/docs/latest/installing.html
 
 ## Contributing
 
