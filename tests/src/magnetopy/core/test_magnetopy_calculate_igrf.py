@@ -5,7 +5,7 @@ import unittest
 
 import pandas as pd
 
-from src.magnetopy.magnetopy_core.calculate_igrf import CalculateIGRF
+from src.magnetopy.magnetopy_core.calculate_igrf import run_calculate_igrf
 from src.magnetopy.magnetopy_utils.magnetopy_files_helper import MagnetoPyFilesHelper
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 
@@ -28,7 +28,7 @@ class TestCalculateIGRF(unittest.TestCase):
             verbose=False,
         )
 
-        CalculateIGRF(arguments=arguments)
+        run_calculate_igrf(arguments)
 
         output_folder = os.path.abspath('resources/cerritos_test')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
@@ -63,7 +63,7 @@ class TestCalculateIGRF(unittest.TestCase):
             verbose=True,
         )
 
-        CalculateIGRF(arguments=arguments)
+        run_calculate_igrf(arguments)
 
         output_folder = os.path.abspath('resources/cerritos_test_verbose')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
@@ -103,7 +103,7 @@ class TestCalculateIGRF(unittest.TestCase):
             verbose=False,
         )
 
-        CalculateIGRF(arguments=arguments)
+        run_calculate_igrf(arguments)
 
         output_folder = os.path.abspath('resources/cerritos_datos_estaciones')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)

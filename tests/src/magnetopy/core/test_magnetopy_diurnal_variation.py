@@ -7,7 +7,7 @@ import pandas as pd
 
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_utils.magnetopy_files_helper import MagnetoPyFilesHelper
-from src.magnetopy.magnetopy_core.diurnal_variation import DiurnalVariation
+from src.magnetopy.magnetopy_core.diurnal_variation import run_diurnal_variation
 
 
 class TestDiurnalVariation(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestDiurnalVariation(unittest.TestCase):
             base_station_cols='date,time,nT'
         )
 
-        DiurnalVariation(arguments=arguments)
+        run_diurnal_variation(arguments)
 
         output_folder = os.path.abspath('resources/cerritos_test')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)
@@ -73,7 +73,7 @@ class TestDiurnalVariation(unittest.TestCase):
             base_station_cols=None
         )
 
-        DiurnalVariation(arguments=arguments)
+        run_diurnal_variation(arguments)
 
         output_folder = os.path.abspath('resources/cerritos_datos_estaciones')
         output_file = MagnetoPyFilesHelper.most_recent_file(folder_path=output_folder)

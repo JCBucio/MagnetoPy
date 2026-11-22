@@ -2,69 +2,27 @@
 from logging import getLogger
 from argparse import Namespace
 
-from src.magnetopy.magnetopy_core.diurnal_variation import DiurnalVariation
-from src.magnetopy.magnetopy_core.calculate_igrf import CalculateIGRF
-from src.magnetopy.magnetopy_core.plot_profile import PlotProfile
-from src.magnetopy.magnetopy_core.plot_map import PlotMap
-from src.magnetopy.magnetopy_core.reduction_to_pole import ReductionToPole
+from src.magnetopy.magnetopy_core.diurnal_variation import run_diurnal_variation
+from src.magnetopy.magnetopy_core.calculate_igrf import run_calculate_igrf
+from src.magnetopy.magnetopy_core.plot_profile import run_plot_profile
+from src.magnetopy.magnetopy_core.plot_map import run_plot_map
+from src.magnetopy.magnetopy_core.reduction_to_pole import run_reduction_to_pole
 from src.magnetopy.magnetopy_utils.magnetopy_logging import MagnetopyLogging
 from src.magnetopy.magnetopy_cli.magnetopy_parser import MagnetopyParser
 
 
-class Magnetopy:
-    
-    def __init__(self):
-        self.magnetopy_logging: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPy')
+_COMMANDS = {
+    'diurnal-variation': run_diurnal_variation,
+    'calculate-igrf':    run_calculate_igrf,
+    'plot-profile':      run_plot_profile,
+    'plot-map':          run_plot_map,
+    'reduction-to-pole': run_reduction_to_pole,
+}
 
-        self.__parser: MagnetopyParser = MagnetopyParser()
-        self.__arguments: Namespace = self.__parser.get_arguments()
-        self.command: str = self.__arguments.command
 
-        self.__magnetopy_flow()
-
-    def __magnetopy_flow(self) -> None:
-        """
-        Runs the MagnetoPy validation flow depending on the command.
-
-        :return: Nothing to return
-        :rtype: None
-        """
-        self.__print_banner()
-
-        if self.command == 'diurnal-variation':
-            self.magnetopy_logging.info("diurnal-variation command selected")
-            DiurnalVariation(arguments=self.__arguments)
-        elif self.command == 'calculate-igrf':
-            self.magnetopy_logging.info("calculate-igrf command selected")
-            CalculateIGRF(arguments=self.__arguments)
-        elif self.command == 'plot-profile':
-            self.magnetopy_logging.info("plot-profile command selected")
-            PlotProfile(arguments=self.__arguments)
-        elif self.command == 'plot-map':
-            self.magnetopy_logging.info("plot-map command selected")
-            PlotMap(arguments=self.__arguments)
-        elif self.command == 'reduction-to-pole':
-            self.magnetopy_logging.info("reduction-to-pole command selected")
-            ReductionToPole(arguments=self.__arguments)
-
-    def __print_banner(self) -> None:
-        """
-        Print banner
-
-        :return: Nothing to return
-        :rtype: None
-        """
-        arguments_str = ''
-        for argument_name, argument_value in vars(self.__arguments).items():
-            arguments_str += f'{argument_name}: {argument_value}\n'
-
-        # Add my tutors to the banner
-        # ---
-        ## Tutors
-        # Dulce María Gutiérrez Carmona
-        # Gerardo Cifuentes Nava
-
-        banner = f'''
+def _print_banner(log: getLogger, arguments: Namespace) -> None:
+    arguments_str = ''.join(f'{k}: {v}\n' for k, v in vars(arguments).items())
+    banner = f'''
 ######################## MAGNETOPY ########################
 ##                                                       ##  
 ##  Written by Juan Carlos Bucio (jcbucio.geo@gmail.com) ##
@@ -79,9 +37,27 @@ class Magnetopy:
 
 {arguments_str}
 ###########################################################
-        '''
+    '''
+    log.info(banner)
 
-        self.magnetopy_logging.info(banner)
+
+def main() -> None:
+    log: getLogger = MagnetopyLogging().create_magnetopy_logging(logger='MagnetoPy')
+
+    parser = MagnetopyParser()
+    arguments: Namespace = parser.get_arguments()
+    command: str = arguments.command
+
+    _print_banner(log, arguments)
+
+    runner = _COMMANDS.get(command)
+    if runner is None:
+        log.error(f"Unknown command: '{command}'")
+        return
+
+    log.info(f"{command} command selected")
+    runner(arguments)
+
 
 if __name__ == '__main__':
-    Magnetopy()
+    main()
