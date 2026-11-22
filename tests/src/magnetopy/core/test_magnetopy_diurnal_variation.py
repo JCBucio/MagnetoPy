@@ -82,7 +82,8 @@ class TestDiurnalVariation(unittest.TestCase):
         output_df = pd.read_csv(output_file_path)
 
         self.assertIn('diurnal_var_corr', output_df.columns)
-        self.assertEqual(len(output_df), 44)
+        input_stations_df = pd.read_csv(arguments.stations_file)
+        self.assertEqual(len(output_df), len(input_stations_df))
 
         os.remove(output_file_path)
 

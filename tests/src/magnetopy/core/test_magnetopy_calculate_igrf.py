@@ -112,7 +112,8 @@ class TestCalculateIGRF(unittest.TestCase):
 
         self.assertIn('mag_anomaly(nT)', output_df.columns)
         self.assertIn('F(nT)', output_df.columns)
-        self.assertEqual(len(output_df), 44)
+        input_stations_df = pd.read_csv(arguments.stations_file)
+        self.assertEqual(len(output_df), len(input_stations_df))
 
         os.remove(output_file_path)
 
